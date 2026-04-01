@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thailand Digital Platform Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F6F4;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --text-muted: #9B9B9B;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.10);
+    --shadow-tooltip: 0 4px 16px rgba(0,0,0,0.12);
+    --pill-border: #E0E0E0;
+    --pill-text: #6B6B6B;
+    --badge-opacity: 0.06;
+    --label-bg: #FFFFFF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141416; --bg-card: #1E1E22; --text-primary: #E8E8E8;
+      --text-secondary: #8B8B8B; --text-muted: #666666;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.30); --shadow-hover: 0 4px 16px rgba(0,0,0,0.40);
+      --shadow-tooltip: 0 4px 16px rgba(0,0,0,0.50);
+      --pill-border: #333333; --pill-text: #888888;
+      --badge-opacity: 0.12; --label-bg: #1E1E22;
+    }
+  }
+  [data-theme="dark"] {
+    --bg: #141416; --bg-card: #1E1E22; --text-primary: #E8E8E8;
+    --text-secondary: #8B8B8B; --text-muted: #666666;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.30); --shadow-hover: 0 4px 16px rgba(0,0,0,0.40);
+    --shadow-tooltip: 0 4px 16px rgba(0,0,0,0.50);
+    --pill-border: #333333; --pill-text: #888888;
+    --badge-opacity: 0.12; --label-bg: #1E1E22;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 32px 16px; transition: background 300ms; }
+  .container { width: 100%; max-width: 980px; }
+  h1 { font-size: 22px; font-weight: 600; color: var(--text-primary); text-align: center; margin-bottom: 16px; transition: color 300ms; }
+  .diagram-svg { width: 100%; max-width: 980px; display: block; }
+  .toggle-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .flow-pill { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; padding: 6px 16px; border-radius: 20px; border: 1px solid var(--pill-border); background: transparent; color: var(--pill-text); cursor: pointer; transition: background 200ms, color 200ms, border-color 200ms; }
+  .flow-pill.active { font-weight: 600; color: #FFFFFF; border-color: transparent; }
+  .flow-pill.active::after { content: ''; display: block; width: 16px; height: 2px; background: white; border-radius: 1px; margin: 4px auto 0; animation: fadeIn 200ms ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .flow-pill[data-flow="discovery"].active { background: #4285F4; }
+  .flow-pill[data-flow="money"].active { background: #0F6E56; }
+  .flow-pill[data-flow="physical"].active { background: #BA7517; }
+  .flow-pill[data-flow="data"].active { background: #185FA5; }
+  .svg-wrapper { position: relative; }
+  .tooltip { position: absolute; background: var(--bg-card); border-radius: 10px; box-shadow: var(--shadow-tooltip); max-width: 220px; padding: 12px 14px; opacity: 0; transition: opacity 150ms, background 300ms; pointer-events: none; z-index: 10; }
+  .tooltip.visible { opacity: 1; pointer-events: auto; }
+  .tooltip-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .tooltip-body { font-size: 11.5px; font-weight: 400; color: var(--text-secondary); line-height: 1.5; }
+  .theme-toggle { position: fixed; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--pill-border); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 20; transition: background 300ms, border-color 300ms; padding: 0; }
+  .theme-toggle svg { width: 16px; height: 16px; fill: var(--text-secondary); transition: fill 300ms; }
+  .theme-toggle .icon-moon { display: none; }
+  [data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+  [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: none; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: block; }
+  }
+  .footer { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 16px; line-height: 1.6; transition: color 300ms; }
+  .mobile-view { display: none; }
+  .mobile-summary { display: none; }
+  @media (max-width: 767px) {
+    .diagram-svg { display: none; }
+    .mobile-view { display: block; }
+    .mobile-layer { border-left: 3px solid var(--layer-color, #999); padding-left: 12px; margin-bottom: 16px; }
+    .mobile-layer-label { text-transform: uppercase; font-size: 11px; font-weight: 600; color: var(--layer-color, #999); margin-bottom: 4px; letter-spacing: 0.08em; }
+    .mobile-node { font-size: 13px; font-weight: 400; color: var(--text-primary); padding: 6px 0; }
+    .mobile-summary { font-size: 12px; color: var(--text-secondary); padding: 8px 12px; background: var(--bg-card); border-radius: 8px; margin-top: 8px; line-height: 1.5; display: none; }
+    .mobile-summary.active { display: block; }
+  }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+  <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<div class="container">
+  <h1>Thailand Digital Platform Ecosystem</h1>
+  <div class="toggle-bar">
+    <button class="flow-pill active" data-flow="discovery" onclick="setActiveFlow('discovery')">Discovery</button>
+    <button class="flow-pill" data-flow="money" onclick="setActiveFlow('money')">Money</button>
+    <button class="flow-pill" data-flow="physical" onclick="setActiveFlow('physical')">Physical</button>
+    <button class="flow-pill" data-flow="data" onclick="setActiveFlow('data')">Data &amp; AI</button>
+  </div>
+  <div class="svg-wrapper">
+  <svg class="diagram-svg" viewBox="0 0 780 860" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.06"/></filter>
+      <marker id="arrow-discovery" viewBox="0 0 6 4" refX="6" refY="2" markerWidth="6" markerHeight="4" orient="auto"><path d="M0,0 L6,2 L0,4 Z" fill="#4285F4"/></marker>
+      <marker id="arrow-money" viewBox="0 0 6 4" refX="6" refY="2" markerWidth="6" markerHeight="4" orient="auto"><path d="M0,0 L6,2 L0,4 Z" fill="#0F6E56"/></marker>
+      <marker id="arrow-physical" viewBox="0 0 6 4" refX="6" refY="2" markerWidth="6" markerHeight="4" orient="auto"><path d="M0,0 L6,2 L0,4 Z" fill="#BA7517"/></marker>
+      <marker id="arrow-data" viewBox="0 0 6 4" refX="6" refY="2" markerWidth="6" markerHeight="4" orient="auto"><path d="M0,0 L6,2 L0,4 Z" fill="#185FA5"/></marker>
+      <filter id="conn-glow"><feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <!-- Grid lines at gap midpoints (8 layers = 7 gaps) -->
+    <g id="grid-lines">
+      <line x1="44" y1="182" x2="744" y2="182" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="274" x2="744" y2="274" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="366" x2="744" y2="366" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="458" x2="744" y2="458" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="550" x2="744" y2="550" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="642" x2="744" y2="642" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="734" x2="744" y2="734" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+    </g>
+    <g id="nodes-layer"></g>
+    <!-- badge layer removed -->
+    <g id="connections-layer" pointer-events="none"></g>
+    <g id="hit-layer"></g>
+    <g id="label-layer" pointer-events="none"></g>
+  </svg>
+  <div class="tooltip" id="tooltip">
+    <div class="tooltip-title" id="tooltip-title"></div>
+    <div class="tooltip-body" id="tooltip-body"></div>
+  </div>
+  </div>
+  <div class="mobile-view" id="mobile-view"></div>
+  <div class="mobile-summary" id="mobile-summary"></div>
+  <div class="footer">Sources: BOT Payment Report Jan 2026, ETDA Platform Registry, DataReportal Digital 2025. Diagram shows ecosystem structure, not all possible connections.</div>
+</div>
+
+<script>
+// 8-layer grid: NODE_H=56, GAP=36, Y_START=108, step=92
+// Participants→Access→Discovery→Execution→Payment→Fulfillment→Intelligence→Digital Infrastructure
+const NODES = {
+  consumers:       { layer: 0, x: 66,  w: 148, y: 108, h: 56, color: '#534AB7', name: 'Consumers & Citizens', sub: '66M internet users' },
+  merchants:       { layer: 0, x: 236, w: 148, y: 108, h: 56, color: '#534AB7', name: 'Merchants & SMEs', sub: '3.4M LINE OA' },
+  creators:        { layer: 0, x: 406, w: 148, y: 108, h: 56, color: '#534AB7', name: 'Creators', sub: 'YouTube, TikTok, LINE' },
+  enterprises:     { layer: 0, x: 576, w: 148, y: 108, h: 56, color: '#534AB7', name: 'Enterprises & Agencies', sub: 'Listed firms, govt' },
+  telecom:         { layer: 1, x: 100, w: 155, y: 200, h: 56, color: '#BA7517', name: 'Telecom / ISPs', sub: 'AIS, TRUE, 3BB' },
+  app_stores:      { layer: 1, x: 311, w: 155, y: 200, h: 56, color: '#BA7517', name: 'OS & App Stores', sub: 'Apple, Google Play' },
+  browsers:        { layer: 1, x: 522, w: 155, y: 200, h: 56, color: '#BA7517', name: 'Browsers & Devices', sub: 'Chrome, Samsung Internet' },
+  search:          { layer: 2, x: 63,  w: 118, y: 292, h: 56, color: '#4285F4', name: 'Search & Maps', sub: 'Google, Longdo' },
+  social:          { layer: 2, x: 200, w: 118, y: 292, h: 56, color: '#4285F4', name: 'Social Media', sub: 'Facebook, TikTok, X' },
+  messaging:       { layer: 2, x: 337, w: 118, y: 292, h: 56, color: '#4285F4', name: 'Messaging', sub: 'LINE, WhatsApp' },
+  advertising:     { layer: 2, x: 474, w: 118, y: 292, h: 56, color: '#4285F4', name: 'Advertising', sub: 'Google Ads, Meta Ads' },
+  news:            { layer: 2, x: 611, w: 118, y: 292, h: 56, color: '#4285F4', name: 'News & Media', sub: 'Thairath, THE STANDARD' },
+  marketplaces:    { layer: 3, x: 66,  w: 148, y: 384, h: 56, color: '#D85A30', name: 'Marketplaces', sub: 'Shopee, Lazada, TikTok Shop' },
+  superapps:       { layer: 3, x: 236, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Super-apps', sub: 'Grab, LINE MAN' },
+  social_commerce: { layer: 3, x: 406, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Social Commerce', sub: 'FB Shops, LINE Shopping' },
+  streaming:       { layer: 3, x: 576, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Streaming', sub: 'YouTube, Netflix, MONOMAX' },
+  promptpay:       { layer: 4, x: 66,  w: 148, y: 476, h: 56, color: '#0F6E56', name: 'Public Rails', sub: 'PromptPay, PromptBiz' },
+  banks:           { layer: 4, x: 236, w: 148, y: 476, h: 56, color: '#0F6E56', name: 'Banks & Acquirers', sub: 'SCB, KBANK, BBL' },
+  ewallets:        { layer: 4, x: 406, w: 148, y: 476, h: 56, color: '#0F6E56', name: 'E-Wallets', sub: 'TrueMoney, Rabbit LINE Pay' },
+  cards:           { layer: 4, x: 576, w: 148, y: 476, h: 56, color: '#0F6E56', name: 'Card Networks', sub: 'Visa, Mastercard, JCB' },
+  parcels:         { layer: 5, x: 100, w: 155, y: 568, h: 56, color: '#BA7517', name: 'Parcel Networks', sub: 'KEX, Flash, J&T' },
+  riders:          { layer: 5, x: 311, w: 155, y: 568, h: 56, color: '#BA7517', name: 'Rider Fleets', sub: 'Grab, LINE MAN, Lalamove' },
+  warehouses:      { layer: 5, x: 522, w: 155, y: 568, h: 56, color: '#BA7517', name: 'Warehouses', sub: 'Shopee Xpress, Lazada hubs' },
+  ai_ml:           { layer: 6, x: 66,  w: 678, y: 660, h: 56, color: '#7C3AED', name: 'AI & Machine Learning', sub: 'OpenAI, Anthropic, Gemini, SCB 10X, VISTEC' },
+  cloud:           { layer: 7, x: 104, w: 260, y: 752, h: 56, color: '#185FA5', name: 'Cloud Providers', sub: 'AWS, GCP, Azure' },
+  cdn:             { layer: 7, x: 424, w: 260, y: 752, h: 56, color: '#185FA5', name: 'CDN & Hosting', sub: 'Cloudflare, Akamai, INET' },
+};
+
+const LAYERS = [
+  { index: 0, label: 'PARTICIPANTS',          color: '#534AB7', y: 108 },
+  { index: 1, label: 'ACCESS',                color: '#BA7517', y: 200 },
+  { index: 2, label: 'DISCOVERY',             color: '#4285F4', y: 292 },
+  { index: 3, label: 'EXECUTION',             color: '#D85A30', y: 384 },
+  { index: 4, label: 'PAYMENT & SETTLEMENT',  color: '#0F6E56', y: 476 },
+  { index: 5, label: 'FULFILLMENT',           color: '#BA7517', y: 568 },
+  { index: 6, label: 'INTELLIGENCE',          color: '#7C3AED', y: 660 },
+  { index: 7, label: 'DIGITAL INFRASTRUCTURE', color: '#185FA5', y: 752 },
+];
+
+const svgNS = 'http://www.w3.org/2000/svg';
+const nodesLayer = document.getElementById('nodes-layer');
+
+function createSVGEl(tag, attrs) {
+  const el = document.createElementNS(svgNS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Render layer labels with bullet dots
+LAYERS.forEach(layer => {
+  const dot = createSVGEl('circle', { cx: 44, cy: layer.y - 14, r: 3, fill: layer.color, 'fill-opacity': '0.7' });
+  nodesLayer.appendChild(dot);
+  const label = createSVGEl('text', {
+    x: 52, y: layer.y - 10, 'font-family': 'DM Sans, sans-serif',
+    'font-size': '11', 'font-weight': '600', 'letter-spacing': '0.08em',
+    fill: layer.color, 'fill-opacity': '0.7',
+  });
+  label.textContent = layer.label;
+  nodesLayer.appendChild(label);
+});
+
+// Render node cards
+Object.entries(NODES).forEach(([id, n]) => {
+  const g = createSVGEl('g', { id: `node-${id}` });
+  g.appendChild(createSVGEl('rect', { x: n.x, y: n.y, width: n.w, height: n.h, rx: '8', fill: '#FFFFFF', filter: 'url(#shadow)' }));
+  g.appendChild(createSVGEl('rect', { x: n.x, y: n.y, width: '2.5', height: n.h, rx: '1', fill: n.color }));
+  const nameEl = createSVGEl('text', { x: n.x + 10, y: n.y + 22, 'font-family': 'DM Sans, sans-serif', 'font-size': '12', 'font-weight': '600', fill: '#1A1A1A' });
+  nameEl.textContent = n.name;
+  g.appendChild(nameEl);
+  const subEl = createSVGEl('text', { x: n.x + 10, y: n.y + 40, 'font-family': 'DM Sans, sans-serif', 'font-size': '10.5', 'font-weight': '400', fill: '#6B6B6B' });
+  subEl.textContent = n.sub;
+  g.appendChild(subEl);
+  nodesLayer.appendChild(g);
+});
+
+// Badges removed
+
+// --- Connection renderer ---
+function orthoPath(pts, R = 6) {
+  if (pts.length < 2) return '';
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const prev = pts[i - 1], curr = pts[i], next = pts[i + 1];
+    const dx1 = Math.sign(curr[0] - prev[0]), dy1 = Math.sign(curr[1] - prev[1]);
+    const dx2 = Math.sign(next[0] - curr[0]), dy2 = Math.sign(next[1] - curr[1]);
+    d += ` L${curr[0] - dx1 * R},${curr[1] - dy1 * R} Q${curr[0]},${curr[1]} ${curr[0] + dx2 * R},${curr[1] + dy2 * R}`;
+  }
+  d += ` L${pts[pts.length - 1][0]},${pts[pts.length - 1][1]}`;
+  return d;
+}
+
+const connLayer = document.getElementById('connections-layer');
+
+// Anchor helpers
+function aTop(id)   { const n = NODES[id]; return [n.x + n.w / 2, n.y]; }
+function aBot(id)   { const n = NODES[id]; return [n.x + n.w / 2, n.y + n.h]; }
+function aLeft(id)  { const n = NODES[id]; return [n.x, n.y + n.h / 2]; }
+function aRight(id) { const n = NODES[id]; return [n.x + n.w, n.y + n.h / 2]; }
+
+// --- Flow data (8-layer: Participants→Access→Discovery→Execution→Payment→Fulfillment→Intelligence→DigitalInfra) ---
+const FLOWS = {
+  discovery: {
+    color: '#4285F4', marker: 'arrow-discovery',
+    connections: [
+      // participants → access (adj 0→1)
+      { from: 'consumers', to: 'telecom',    label: 'Go online',        waypoints: [[140,164],[140,178],[178,178],[178,200]] },
+      { from: 'consumers', to: 'app_stores', label: 'Install apps',     waypoints: [[140,164],[140,183],[389,183],[389,200]] },
+      { from: 'consumers', to: 'browsers',   label: 'Web access',       waypoints: [[140,164],[140,188],[600,188],[600,200]] },
+      // access → discovery (adj 1→2)
+      { from: 'browsers', to: 'search', label: 'Web search', waypoints: [[600,256],[600,274],[122,274],[122,292]] },
+      // participants → discovery (skip 0→2 via left gutter)
+      { from: 'consumers', to: 'social',     label: 'Feed browsing',    waypoints: [[66,136],[36,136],[36,290],[259,290],[259,292]] },
+      { from: 'consumers', to: 'messaging',  label: 'Direct messaging', waypoints: [[66,136],[22,136],[22,290],[396,290],[396,292]] },
+      { from: 'merchants', to: 'advertising', label: 'Ad spend',        waypoints: [[310,164],[310,270],[533,270],[533,292]] },
+      { from: 'enterprises', to: 'advertising', label: 'Enterprise campaigns', waypoints: [[650,164],[650,266],[533,266],[533,292]] },
+      // direct usage (skip 0→3 via gutter — repeat users skip discovery)
+      { from: 'consumers', to: 'marketplaces', label: 'Direct / repeat', waypoints: [[66,136],[8,136],[8,382],[140,382],[140,384]] },
+      { from: 'consumers', to: 'superapps',    label: 'Direct / repeat', waypoints: [[214,136],[750,136],[750,382],[310,382],[310,384]] },
+      // creators paths (skip 0→2, 0→3)
+      { from: 'creators', to: 'social',          label: 'Content creation',  waypoints: [[480,164],[480,274],[259,274],[259,292]] },
+      { from: 'creators', to: 'streaming',       label: 'Creator content',   waypoints: [[554,136],[762,136],[762,378],[650,378],[650,384]] },
+      { from: 'creators', to: 'social_commerce', label: 'Creator affiliate', waypoints: [[554,136],[755,136],[755,382],[480,382],[480,384]] },
+      // discovery → execution (adj 2→3)
+      { from: 'search',     to: 'marketplaces',    label: 'Product search',     waypoints: [[122,348],[122,366],[140,366],[140,384]] },
+      { from: 'social',     to: 'superapps',       label: 'Content to commerce',waypoints: [[259,348],[259,363],[310,363],[310,384]] },
+      { from: 'social',     to: 'social_commerce', label: 'In-app shops',       waypoints: [[259,348],[259,370],[480,370],[480,384]] },
+      { from: 'messaging',  to: 'social_commerce',  label: 'Chat commerce',      waypoints: [[396,348],[396,356],[480,356],[480,384]] },
+      { from: 'search',     to: 'superapps',       label: 'Maps discovery',     waypoints: [[122,348],[122,362],[310,362],[310,384]] },
+      { from: 'advertising',to: 'marketplaces',    label: 'Paid placement',     waypoints: [[533,348],[533,358],[140,358],[140,384]] },
+      { from: 'advertising',to: 'social_commerce', label: 'Boosted listings',   waypoints: [[533,348],[533,374],[480,374],[480,384]] },
+      // reverse flows
+      { from: 'streaming', to: 'advertising', label: 'Ad inventory', waypoints: [[650,384],[650,366],[533,366],[533,348]] },
+      { from: 'advertising', to: 'creators', label: 'Brand campaigns', waypoints: [[592,320],[745,320],[745,106],[480,106],[480,108]] },
+      // lateral in discovery
+      { from: 'social', to: 'messaging', label: 'Cross-referral', waypoints: [[259,292],[259,277],[396,277],[396,292]], lateral: true },
+      { from: 'social', to: 'news', label: 'Content sharing', waypoints: [[259,292],[259,263],[670,263],[670,292]], lateral: true },
+    ],
+  },
+  money: {
+    color: '#0F6E56', marker: 'arrow-money',
+    connections: [
+      // consumers → payment (skip 0→4 via gutter)
+      { from: 'consumers', to: 'ewallets', label: 'Top-up / pay',   waypoints: [[66,136],[36,136],[36,474],[480,474],[480,476]] },
+      { from: 'consumers', to: 'banks',    label: 'Bank transfer',   waypoints: [[66,136],[22,136],[22,471],[310,471],[310,476]] },
+      { from: 'consumers', to: 'cards',    label: 'Card payment',    waypoints: [[214,136],[750,136],[750,474],[650,474],[650,476]] },
+      // execution → payment (adj 3→4)
+      { from: 'marketplaces', to: 'promptpay', label: 'QR checkout',    waypoints: [[140,440],[140,476]] },
+      { from: 'marketplaces', to: 'ewallets',  label: 'Wallet checkout', waypoints: [[140,440],[140,462],[480,462],[480,476]] },
+      { from: 'marketplaces', to: 'cards',     label: 'Card checkout',   waypoints: [[140,440],[140,466],[650,466],[650,476]] },
+      { from: 'marketplaces', to: 'banks',     label: 'Bank app checkout', waypoints: [[140,440],[140,455],[310,455],[310,476]] },
+      { from: 'superapps',    to: 'ewallets',  label: 'In-app payment',waypoints: [[310,440],[310,458],[480,458],[480,476]] },
+      { from: 'social_commerce', to: 'ewallets', label: 'Social checkout', waypoints: [[480,440],[480,476]] },
+      { from: 'cards', to: 'streaming', label: 'Subscription settlement', waypoints: [[650,476],[650,440]] },
+      // settlement payouts (banks → supply side)
+      { from: 'banks', to: 'merchants', label: 'Merchant settlement', waypoints: [[236,504],[8,504],[8,106],[310,106],[310,108]] },
+      { from: 'banks', to: 'creators',  label: 'Creator payout',     waypoints: [[384,504],[750,504],[750,106],[480,106],[480,108]] },
+      { from: 'banks', to: 'parcels',   label: 'Logistics fees',     waypoints: [[310,532],[310,550],[178,550],[178,568]] },
+      { from: 'banks', to: 'riders',    label: 'Rider payout',       waypoints: [[310,532],[310,554],[389,554],[389,568]] },
+      // lateral in payment layer
+      { from: 'promptpay', to: 'banks',    label: 'Interbank rails', waypoints: [[140,476],[140,453],[310,453],[310,476]], lateral: true },
+      { from: 'ewallets',  to: 'banks',    label: 'Float settlement',waypoints: [[480,476],[480,448],[310,448],[310,476]], lateral: true },
+      { from: 'cards',     to: 'banks',    label: 'Card acquiring',  waypoints: [[650,476],[650,443],[310,443],[310,476]], lateral: true },
+    ],
+  },
+  physical: {
+    color: '#BA7517', marker: 'arrow-physical',
+    connections: [
+      // execution → fulfillment (skip 3→5 via gutter)
+      { from: 'marketplaces', to: 'parcels',    label: 'Ship order',     waypoints: [[66,412],[36,412],[36,566],[178,566],[178,568]] },
+      { from: 'marketplaces', to: 'warehouses', label: 'Fulfillment',    waypoints: [[66,412],[22,412],[22,566],[600,566],[600,568]] },
+      { from: 'superapps',    to: 'riders',     label: 'Dispatch rider', waypoints: [[236,412],[8,412],[8,566],[389,566],[389,568]] },
+      { from: 'social_commerce', to: 'parcels', label: 'Ship order',    waypoints: [[554,412],[750,412],[750,562],[178,562],[178,568]] },
+      { from: 'social_commerce', to: 'riders',  label: 'Local delivery', waypoints: [[554,412],[755,412],[755,558],[389,558],[389,568]] },
+      // fulfillment → consumers (skip 5→0 via gutter)
+      { from: 'parcels', to: 'consumers', label: 'Delivery',   waypoints: [[100,596],[36,596],[36,106],[140,106],[140,108]] },
+      { from: 'riders',  to: 'consumers', label: 'Last-mile',  waypoints: [[311,596],[22,596],[22,103],[140,103],[140,108]] },
+      // lateral in fulfillment
+      { from: 'warehouses', to: 'parcels', label: 'Pack & ship', waypoints: [[600,568],[600,542],[178,542],[178,568]], lateral: true },
+    ],
+  },
+  data: {
+    color: '#185FA5', marker: 'arrow-data',
+    connections: [
+      // AI model output (dashed) — from layer 6 up to layers 2-3
+      { from: 'ai_ml', to: 'search',       label: 'Search ranking',    waypoints: [[66,688],[36,688],[36,290],[122,290],[122,292]], dashed: true },
+      { from: 'ai_ml', to: 'social',       label: 'Content ranking',   waypoints: [[66,688],[22,688],[22,290],[259,290],[259,292]], dashed: true },
+      { from: 'ai_ml', to: 'marketplaces', label: 'Recommendations',   waypoints: [[66,688],[8,688],[8,382],[140,382],[140,384]], dashed: true },
+      // Data exhaust — from journey layers to layer 7 via right gutter
+      { from: 'marketplaces', to: 'cloud', label: 'Transaction data',  waypoints: [[214,412],[750,412],[750,750],[234,750],[234,752]] },
+      { from: 'social',       to: 'cloud', label: 'Engagement data',   waypoints: [[318,320],[755,320],[755,748],[239,748],[239,752]] },
+      { from: 'promptpay',    to: 'cloud', label: 'Payment data',      waypoints: [[214,504],[745,504],[745,746],[244,746],[244,752]] },
+      { from: 'enterprises',  to: 'cloud', label: 'Enterprise workloads', waypoints: [[724,136],[760,136],[760,744],[249,744],[249,752]] },
+      { from: 'advertising',  to: 'cloud', label: 'Ad & audience data',waypoints: [[592,320],[740,320],[740,742],[254,742],[254,752]] },
+      { from: 'superapps',    to: 'cloud', label: 'Location & txn data',waypoints: [[384,412],[747,412],[747,740],[259,740],[259,752]] },
+      { from: 'streaming',   to: 'cloud', label: 'Streaming data',    waypoints: [[724,412],[735,412],[735,738],[264,738],[264,752]] },
+      { from: 'social_commerce',to:'cloud',label:'Commerce data',      waypoints: [[554,412],[730,412],[730,736],[269,736],[269,752]] },
+      // Cloud feeds AI (adj 7→6, going up)
+      { from: 'cloud', to: 'ai_ml', label: 'Compute / model serving', waypoints: [[300,752],[300,734],[405,734],[405,716]] },
+      // lateral at digital infrastructure
+      { from: 'cloud', to: 'cdn', label: 'Content delivery', waypoints: [[234,752],[234,738],[554,738],[554,752]], lateral: true },
+    ],
+  },
+};
+
+// Compute FLOW_NODES
+const FLOW_NODES = {};
+Object.entries(FLOWS).forEach(([name, flow]) => {
+  const ids = new Set();
+  flow.connections.forEach(c => { ids.add(c.from); ids.add(c.to); });
+  FLOW_NODES[name] = [...ids];
+});
+
+// Render flow groups
+Object.entries(FLOWS).forEach(([name, flow]) => {
+  const g = createSVGEl('g', { class: `flow-group flow-${name}` });
+  g.style.opacity = name === 'discovery' ? '1' : '0';
+  g.style.transition = 'opacity 200ms';
+  flow.connections.forEach((conn, i) => {
+    const attrs = {
+      d: orthoPath(conn.waypoints), stroke: flow.color,
+      'stroke-width': '1.5', 'stroke-opacity': '0.5', fill: 'none',
+      class: 'conn-line', 'data-conn-id': `${name}-${i}`,
+      'data-from': conn.from, 'data-to': conn.to,
+      'marker-end': `url(#${flow.marker})`,
+    };
+    const path = createSVGEl('path', attrs);
+    if (conn.dashed) path.setAttribute('stroke-dasharray', '6 4');
+    g.appendChild(path);
+  });
+  connLayer.appendChild(g);
+});
+
+// Flow toggle
+function setActiveFlow(name) {
+  document.querySelectorAll('.flow-group').forEach(g => {
+    g.style.opacity = g.classList.contains(`flow-${name}`) ? '1' : '0';
+  });
+  document.querySelectorAll('.flow-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.flow === name);
+  });
+  Object.keys(NODES).forEach(id => {
+    const el = document.getElementById(`node-${id}`);
+    if (!el) return;
+    el.style.opacity = FLOW_NODES[name].includes(id) ? '1' : '0.35';
+    el.style.transition = 'opacity 200ms';
+  });
+}
+
+// --- Interactions ---
+const TOOLTIPS = {
+  ai_ml:           'OpenAI API. Anthropic Claude. Google Gemini. SCB 10X (local AI). VISTEC research.',
+  consumers:       'Thai internet population. 57M social media users. 54M e-commerce buyers.',
+  merchants:       '3.4M LINE Official Accounts. 1M+ Shopee sellers. 500K+ Lazada sellers. 3M+ TikTok Shop merchants.',
+  creators:        'YouTube/TikTok content creators. LINE sticker creators. TikTok Shop affiliates. Live commerce hosts.',
+  enterprises:     'SET-listed companies. Government agencies. Large corporates and MNCs.',
+  telecom:         'AIS (46M subs). TRUE (incl. former dtac, 34M+). Fixed broadband: TRUE, AIS Fibre, 3BB.',
+  app_stores:      'Apple App Store. Google Play Store. Huawei AppGallery. Samsung Galaxy Store.',
+  browsers:        'Chrome (dominant). Safari. Samsung Internet. Firefox. In-app browsers.',
+  search:          'Google (90%+ share). Apple Maps. Longdo Map (Thai local). Google Maps.',
+  social:          'Facebook (50M). TikTok (50M MAU). Instagram (18M). X/Twitter. Threads.',
+  messaging:       'LINE (56M users, dominant). WhatsApp. Telegram. Facebook Messenger.',
+  advertising:     'Google Ads. Meta/Facebook Ads. TikTok Ads. LINE Ads. Programmatic DSPs.',
+  news:            'Thairath Online. Matichon. THE STANDARD. Workpoint. Khaosod.',
+  marketplaces:    'Shopee (#1 GMV). Lazada. TikTok Shop (fastest growing). NocNoc. JD Central (closed).',
+  superapps:       'Grab (ride-hail + food + pay). LINE MAN (food + messenger). Robinhood (food, Thai-owned).',
+  social_commerce: 'Facebook Shops & Marketplace. LINE Shopping. TikTok Shop. Instagram Shopping.',
+  streaming:       'YouTube (dominant). Netflix. MONOMAX (Thai). Viu. Disney+ Hotstar. WeTV.',
+  promptpay:       'PromptPay: 92.2M IDs registered (Jan 2026). 79.9M daily transactions. PromptBiz for B2B.',
+  banks:           '181.8M internet/mobile banking accounts (Jan 2026). SCB, KBANK, BBL, KTB, Krungsri.',
+  ewallets:        '112.3M e-money accounts (Jan 2026). TrueMoney. Rabbit LINE Pay. ShopeePay. GrabPay.',
+  cards:           'Visa. Mastercard. JCB (strong in TH). UnionPay. Local debit scheme.',
+  parcels:         'KEX Express (formerly Kerry). Flash Express. J&T Express. Thailand Post. SPX Express.',
+  riders:          'Grab. LINE MAN. Lalamove. Bolt (launched Bangkok 2020). Food delivery + courier.',
+  warehouses:      'Shopee Xpress fulfillment hubs. Lazada sort centers. KEX warehouses. 3PL providers.',
+  cloud:           'AWS (longest presence). Google Cloud Bangkok region (launched Jan 2026). Azure. Alibaba Cloud.',
+  cdn:             'Cloudflare. Akamai. Local data centers: INET, TRUE IDC, NT (formerly CAT).',
+};
+
+let activeFlowName = 'discovery';
+const hitLayer = document.getElementById('hit-layer');
+const labelLayer = document.getElementById('label-layer');
+const svgEl = document.querySelector('.diagram-svg');
+
+function clearChildren(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+function labelPosition(waypoints) {
+  let maxLen = 0, mx = 0, my = 0;
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const [x1, y1] = waypoints[i], [x2, y2] = waypoints[i + 1];
+    const len = Math.abs(x2 - x1) + Math.abs(y2 - y1);
+    if (len > maxLen) { maxLen = len; mx = (x1 + x2) / 2; my = (y1 + y2) / 2; }
+  }
+  return [mx, my];
+}
+
+function buildInteractionLayers() {
+  clearChildren(hitLayer); clearChildren(labelLayer);
+  Object.entries(FLOWS).forEach(([name, flow]) => {
+    flow.connections.forEach((conn, i) => {
+      const connId = `${name}-${i}`;
+      const hit = createSVGEl('path', { d: orthoPath(conn.waypoints), stroke: 'transparent', 'stroke-width': '14', fill: 'none', 'pointer-events': 'stroke', class: 'conn-hit', 'data-conn-id': connId, 'data-flow': name, 'data-from': conn.from, 'data-to': conn.to });
+      hit.style.display = name === activeFlowName ? '' : 'none';
+      hitLayer.appendChild(hit);
+      const [lx, ly] = labelPosition(conn.waypoints);
+      const lg = createSVGEl('g', { class: 'conn-label', 'data-conn-id': connId, 'data-flow': name });
+      lg.style.opacity = '0'; lg.style.transition = 'opacity 150ms'; lg.setAttribute('pointer-events', 'none');
+      const lRect = createSVGEl('rect', { rx: '3', fill: '#FFFFFF', stroke: 'none' });
+      const lText = createSVGEl('text', { 'text-anchor': 'middle', 'font-family': 'DM Sans, sans-serif', 'font-size': '10', 'font-weight': '500', fill: flow.color, x: lx, y: ly + 3.5 });
+      lText.textContent = conn.label;
+      lg.appendChild(lRect); lg.appendChild(lText); labelLayer.appendChild(lg);
+      requestAnimationFrame(() => { const bbox = lText.getBBox(); lRect.setAttribute('x', bbox.x - 4); lRect.setAttribute('y', bbox.y - 2); lRect.setAttribute('width', bbox.width + 8); lRect.setAttribute('height', bbox.height + 4); });
+    });
+  });
+}
+buildInteractionLayers();
+
+function highlightConnection(connId, show) {
+  const g = document.querySelector(`.flow-${activeFlowName}`);
+  if (!g) return;
+  g.querySelectorAll('.conn-line').forEach(p => {
+    if (show) { const m = p.dataset.connId === connId; p.setAttribute('stroke-width', m ? '2.5' : '1.5'); p.setAttribute('stroke-opacity', m ? '0.85' : '0.08'); p.style.filter = m ? 'url(#conn-glow)' : ''; }
+    else { p.setAttribute('stroke-width', '1.5'); p.setAttribute('stroke-opacity', '0.5'); p.style.filter = ''; }
+  });
+  document.querySelectorAll(`.conn-label[data-conn-id="${connId}"]`).forEach(l => { l.style.opacity = show ? '1' : '0'; });
+}
+
+hitLayer.addEventListener('mouseover', e => { const h = e.target.closest('.conn-hit'); if (h) highlightConnection(h.dataset.connId, true); });
+hitLayer.addEventListener('mouseout', e => { const h = e.target.closest('.conn-hit'); if (h) highlightConnection(h.dataset.connId, false); });
+
+function highlightNode(nodeId, show) {
+  const g = document.querySelector(`.flow-${activeFlowName}`); if (!g) return;
+  const touching = new Set();
+  g.querySelectorAll('.conn-line').forEach(p => { if (p.dataset.from === nodeId || p.dataset.to === nodeId) touching.add(p.dataset.connId); });
+  g.querySelectorAll('.conn-line').forEach(p => {
+    if (show) { const m = touching.has(p.dataset.connId); p.setAttribute('stroke-width', m ? '2.2' : '1.5'); p.setAttribute('stroke-opacity', m ? '0.85' : '0.08'); p.style.filter = m ? 'url(#conn-glow)' : ''; }
+    else { p.setAttribute('stroke-width', '1.5'); p.setAttribute('stroke-opacity', '0.5'); p.style.filter = ''; }
+  });
+  touching.forEach(cid => { document.querySelectorAll(`.conn-label[data-conn-id="${cid}"]`).forEach(l => { l.style.opacity = show ? '1' : '0'; }); });
+}
+
+Object.keys(NODES).forEach(id => {
+  const el = document.getElementById(`node-${id}`); if (!el) return;
+  el.style.cursor = 'pointer';
+  el.addEventListener('mouseenter', () => highlightNode(id, true));
+  el.addEventListener('mouseleave', () => highlightNode(id, false));
+});
+
+// Tooltip
+const tooltipEl = document.getElementById('tooltip');
+const tooltipTitle = document.getElementById('tooltip-title');
+const tooltipBody = document.getElementById('tooltip-body');
+let openTooltipId = null;
+
+function showTooltip(nodeId) {
+  const n = NODES[nodeId]; if (!n || !TOOLTIPS[nodeId]) return;
+  tooltipTitle.textContent = n.name; tooltipBody.textContent = TOOLTIPS[nodeId];
+  const svgRect = svgEl.getBoundingClientRect();
+  const scaleX = svgRect.width / 780, scaleY = svgRect.height / 860;
+  let tx = (n.x + n.w / 2) * scaleX - 110;
+  let ty = (n.y + n.h + 8) * scaleY;
+  tx = Math.max(4, Math.min(tx, svgRect.width - 224));
+  if (ty + 120 > svgRect.height) ty = (n.y - 8) * scaleY - 100;
+  tooltipEl.style.left = tx + 'px'; tooltipEl.style.top = ty + 'px';
+  tooltipEl.classList.add('visible'); openTooltipId = nodeId;
+}
+function hideTooltip() { tooltipEl.classList.remove('visible'); openTooltipId = null; }
+
+Object.keys(NODES).forEach(id => {
+  const el = document.getElementById(`node-${id}`); if (!el) return;
+  el.addEventListener('click', e => { e.stopPropagation(); if (openTooltipId === id) { hideTooltip(); return; } showTooltip(id); });
+});
+document.addEventListener('click', () => hideTooltip());
+
+// Draw-in animation
+const _origSetFlow = setActiveFlow;
+setActiveFlow = function(name) {
+  activeFlowName = name;
+  document.querySelectorAll('.flow-pill').forEach(btn => { btn.classList.toggle('active', btn.dataset.flow === name); });
+  Object.keys(NODES).forEach(id => {
+    const el = document.getElementById(`node-${id}`); if (!el) return;
+    el.style.opacity = FLOW_NODES[name].includes(id) ? '1' : '0.35';
+    el.style.transition = 'opacity 200ms';
+  });
+  document.querySelectorAll('.flow-group').forEach(g => {
+    if (g.classList.contains(`flow-${name}`)) {
+      g.style.opacity = '1';
+      g.querySelectorAll('.conn-line').forEach(path => {
+        const origDash = path.getAttribute('data-orig-dash') || '';
+        const len = path.getTotalLength();
+        path.style.transition = 'none';
+        path.setAttribute('stroke-dasharray', len);
+        path.setAttribute('stroke-dashoffset', len);
+        requestAnimationFrame(() => { requestAnimationFrame(() => {
+          path.style.transition = 'stroke-dashoffset 400ms ease-out';
+          path.setAttribute('stroke-dashoffset', '0');
+          setTimeout(() => { if (origDash) path.setAttribute('stroke-dasharray', origDash); else path.removeAttribute('stroke-dasharray'); }, 420);
+        }); });
+      });
+    } else { g.style.opacity = '0'; }
+  });
+  document.querySelectorAll('.conn-hit').forEach(h => { h.style.display = h.dataset.flow === name ? '' : 'none'; });
+  hideTooltip();
+};
+
+document.querySelectorAll('.conn-line').forEach(p => { const da = p.getAttribute('stroke-dasharray'); if (da) p.setAttribute('data-orig-dash', da); });
+
+// --- Dark mode ---
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme');
+  const isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  applyThemeToSVG();
+}
+
+function applyThemeToSVG() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const cardFill = isDark ? '#1E1E22' : '#FFFFFF';
+  const textPrimary = isDark ? '#E8E8E8' : '#1A1A1A';
+  const textSecondary = isDark ? '#8B8B8B' : '#6B6B6B';
+  const badgeOpacity = isDark ? '0.12' : '0.06';
+  const labelBg = isDark ? '#1E1E22' : '#FFFFFF';
+  Object.keys(NODES).forEach(id => {
+    const g = document.getElementById(`node-${id}`); if (!g) return;
+    const rects = g.querySelectorAll('rect'); if (rects[0]) rects[0].setAttribute('fill', cardFill);
+    const texts = g.querySelectorAll('text'); if (texts[0]) texts[0].setAttribute('fill', textPrimary); if (texts[1]) texts[1].setAttribute('fill', textSecondary);
+  });
+  // badges removed
+  document.querySelectorAll('.conn-label rect').forEach(r => { r.setAttribute('fill', labelBg); });
+}
+
+// --- Mobile view ---
+const MOBILE_SUMMARIES = {
+  discovery: 'Consumers find products via search, social, and messaging, which drive traffic to marketplaces and super-apps.',
+  money: 'Consumers pay through e-wallets and banks. Marketplaces settle via PromptPay. Banks return funds to merchants.',
+  physical: 'Marketplaces ship via parcel networks and warehouses. Super-apps dispatch riders. Goods reach consumers.',
+  data: 'Platform data flows down to cloud infrastructure. AI intelligence feeds up to enhance search, social, and commerce.',
+};
+
+const LAYER_DATA = [
+  { label: 'PARTICIPANTS', color: '#534AB7', nodes: ['consumers','merchants','creators','enterprises'] },
+  { label: 'ACCESS', color: '#BA7517', nodes: ['telecom','app_stores','browsers'] },
+  { label: 'DISCOVERY', color: '#4285F4', nodes: ['search','social','messaging','advertising','news'] },
+  { label: 'EXECUTION', color: '#D85A30', nodes: ['marketplaces','superapps','social_commerce','streaming'] },
+  { label: 'PAYMENT & SETTLEMENT', color: '#0F6E56', nodes: ['promptpay','banks','ewallets','cards'] },
+  { label: 'FULFILLMENT', color: '#BA7517', nodes: ['parcels','riders','warehouses'] },
+  { label: 'INTELLIGENCE', color: '#7C3AED', nodes: ['ai_ml'] },
+  { label: 'DIGITAL INFRASTRUCTURE', color: '#185FA5', nodes: ['cloud','cdn'] },
+];
+
+const mobileView = document.getElementById('mobile-view');
+LAYER_DATA.forEach(layer => {
+  const div = document.createElement('div');
+  div.className = 'mobile-layer'; div.style.setProperty('--layer-color', layer.color);
+  const lbl = document.createElement('div'); lbl.className = 'mobile-layer-label'; lbl.textContent = layer.label;
+  div.appendChild(lbl);
+  layer.nodes.forEach(id => { const n = NODES[id]; if (!n) return; const nd = document.createElement('div'); nd.className = 'mobile-node'; nd.textContent = `${n.name} \u2014 ${n.sub}`; div.appendChild(nd); });
+  mobileView.appendChild(div);
+});
+
+const mobileSummary = document.getElementById('mobile-summary');
+const _prevSetFlow = setActiveFlow;
+setActiveFlow = function(name) { _prevSetFlow(name); mobileSummary.textContent = MOBILE_SUMMARIES[name] || ''; mobileSummary.classList.add('active'); };
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!document.documentElement.getAttribute('data-theme')) applyThemeToSVG(); });
+
+setActiveFlow('discovery');
+applyThemeToSVG();
+</script>
+</body>
+</html>

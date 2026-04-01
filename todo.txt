@@ -1,0 +1,24 @@
+further analysis on the following flows:
+
+Discovery Flow
+  Connections between discovery and execution
+   - social media should also connect to the marketplaces and social commerce?
+   - messaging should connect to super-apps?
+   - advertising should connect to super-apps also?
+   *verify this, each of the discovery node should connect to all execution?
+  Connections between access, and discovery and execution
+   - OS & App Stores should connect to all nodes in discovery and execution layers?
+   - Browsers & Devices should be only "Browsers" and should also connect to News & content?
+Money Flow
+  Connections between Participants and access
+   - consumers and Enterprises & Agencies also pays OS & App Stores?
+  Connections between execution and payment layers
+   - the payment and settlement layers should connect to execution layer also not just one way connection?
+   - someone should pay the warehouse not sure who, merchants?
+Data and AI Flow
+  Connections between participants and other layers
+   - participants/merchant/creators data also flows to the discovery execution and payment layers also through the access layer like telecom gate way?
+   ** for me data is flowing every where, not sure how complicate this will be?
+
+
+
