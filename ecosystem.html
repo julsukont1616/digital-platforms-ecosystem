@@ -96,7 +96,7 @@
     <button class="flow-pill" data-flow="data" onclick="setActiveFlow('data')">Data &amp; AI</button>
   </div>
   <div class="svg-wrapper">
-  <svg class="diagram-svg" viewBox="0 0 780 860" xmlns="http://www.w3.org/2000/svg">
+  <svg class="diagram-svg" viewBox="0 0 780 980" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.06"/></filter>
       <marker id="arrow-discovery" viewBox="0 0 6 4" refX="6" refY="2" markerWidth="6" markerHeight="4" orient="auto"><path d="M0,0 L6,2 L0,4 Z" fill="#4285F4"/></marker>
@@ -107,13 +107,13 @@
     </defs>
     <!-- Grid lines at gap midpoints (8 layers = 7 gaps) -->
     <g id="grid-lines">
-      <line x1="44" y1="182" x2="744" y2="182" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
-      <line x1="44" y1="274" x2="744" y2="274" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
-      <line x1="44" y1="366" x2="744" y2="366" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
-      <line x1="44" y1="458" x2="744" y2="458" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
-      <line x1="44" y1="550" x2="744" y2="550" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
-      <line x1="44" y1="642" x2="744" y2="642" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
-      <line x1="44" y1="734" x2="744" y2="734" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="190" x2="744" y2="190" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="298" x2="744" y2="298" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="406" x2="744" y2="406" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="514" x2="744" y2="514" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="622" x2="744" y2="622" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="730" x2="744" y2="730" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
+      <line x1="44" y1="838" x2="744" y2="838" stroke="#9B9B9B" stroke-opacity="0.08" stroke-width="0.5"/>
     </g>
     <g id="nodes-layer"></g>
     <!-- badge layer removed -->
@@ -185,6 +185,10 @@ Object.assign(NODES.streaming, { layer: 2, x: 650, w: 108, y: 292, color: '#4285
 Object.assign(NODES.marketplaces, { x: 50, w: 180 });
 Object.assign(NODES.superapps, { x: 300, w: 180 });
 Object.assign(NODES.social_commerce, { x: 560, w: 180 });
+
+const LAYER_Y = [108, 216, 324, 432, 540, 648, 756, 864];
+LAYERS.forEach((layer, i) => { layer.y = LAYER_Y[i]; });
+Object.values(NODES).forEach(node => { node.y = LAYERS[node.layer].y; });
 
 const svgNS = 'http://www.w3.org/2000/svg';
 const nodesLayer = document.getElementById('nodes-layer');
@@ -551,7 +555,8 @@ function buildInteractionLayers() {
       lText.textContent = conn.label;
       lg.appendChild(lRect); lg.appendChild(lText); labelLayer.appendChild(lg);
       requestAnimationFrame(() => {
-        const clampMinX = 12, clampMaxX = 768, clampMinY = 12, clampMaxY = 848;
+        const viewBox = svgEl.viewBox.baseVal;
+        const clampMinX = 12, clampMaxX = viewBox.width - 12, clampMinY = 12, clampMaxY = viewBox.height - 12;
         let bbox = lText.getBBox();
         let nextX = parseFloat(lText.getAttribute('x'));
         let nextY = parseFloat(lText.getAttribute('y'));
@@ -613,7 +618,8 @@ function showTooltip(nodeId) {
   const n = NODES[nodeId]; if (!n || !TOOLTIPS[nodeId]) return;
   tooltipTitle.textContent = n.name; tooltipBody.textContent = TOOLTIPS[nodeId];
   const svgRect = svgEl.getBoundingClientRect();
-  const scaleX = svgRect.width / 780, scaleY = svgRect.height / 860;
+  const viewBox = svgEl.viewBox.baseVal;
+  const scaleX = svgRect.width / viewBox.width, scaleY = svgRect.height / viewBox.height;
   let tx = (n.x + n.w / 2) * scaleX - 110;
   let ty = (n.y + n.h + 8) * scaleY;
   tx = Math.max(4, Math.min(tx, svgRect.width - 224));
