@@ -128,7 +128,7 @@
   </div>
   <div class="mobile-view" id="mobile-view"></div>
   <div class="mobile-summary" id="mobile-summary"></div>
-  <div class="footer">Sources: BOT Payment Report Jan 2026, ETDA Platform Registry, DataReportal Digital 2025. Diagram shows ecosystem structure, not all possible connections.</div>
+  <div class="footer">Sources: BOT Payment Report Jan 2026, ETDA Platform Registry, DataReportal Digital 2025. Diagram shows representative primary connections, not every possible platform relationship.</div>
 </div>
 
 <script>
@@ -150,7 +150,7 @@ const NODES = {
   marketplaces:    { layer: 3, x: 66,  w: 148, y: 384, h: 56, color: '#D85A30', name: 'Marketplaces', sub: 'Shopee, Lazada, TikTok Shop' },
   superapps:       { layer: 3, x: 236, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Super-apps', sub: 'Grab, LINE MAN' },
   social_commerce: { layer: 3, x: 406, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Social Commerce', sub: 'FB Shops, LINE Shopping' },
-  streaming:       { layer: 3, x: 576, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Streaming', sub: 'YouTube, Netflix, MONOMAX' },
+  streaming:       { layer: 3, x: 576, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Streaming', sub: 'YouTube, Netflix, Viu' },
   promptpay:       { layer: 4, x: 66,  w: 148, y: 476, h: 56, color: '#0F6E56', name: 'Public Rails', sub: 'PromptPay, PromptBiz' },
   banks:           { layer: 4, x: 236, w: 148, y: 476, h: 56, color: '#0F6E56', name: 'Banks & Acquirers', sub: 'SCB, KBANK, BBL' },
   ewallets:        { layer: 4, x: 406, w: 148, y: 476, h: 56, color: '#0F6E56', name: 'E-Wallets', sub: 'TrueMoney, Rabbit LINE Pay' },
@@ -173,6 +173,18 @@ const LAYERS = [
   { index: 6, label: 'INTELLIGENCE',          color: '#7C3AED', y: 660 },
   { index: 7, label: 'DIGITAL INFRASTRUCTURE', color: '#185FA5', y: 752 },
 ];
+
+LAYERS[2].label = 'DISCOVERY & CONTENT';
+Object.assign(NODES.browsers, { name: 'Browsers', sub: 'Chrome, Safari, Samsung Internet' });
+Object.assign(NODES.search, { x: 50, w: 108 });
+Object.assign(NODES.social, { x: 170, w: 108 });
+Object.assign(NODES.messaging, { x: 290, w: 108 });
+Object.assign(NODES.advertising, { x: 410, w: 108 });
+Object.assign(NODES.news, { x: 530, w: 108 });
+Object.assign(NODES.streaming, { layer: 2, x: 650, w: 108, y: 292, color: '#4285F4' });
+Object.assign(NODES.marketplaces, { x: 50, w: 180 });
+Object.assign(NODES.superapps, { x: 300, w: 180 });
+Object.assign(NODES.social_commerce, { x: 560, w: 180 });
 
 const svgNS = 'http://www.w3.org/2000/svg';
 const nodesLayer = document.getElementById('nodes-layer');
@@ -339,6 +351,95 @@ const FLOWS = {
   },
 };
 
+FLOWS.discovery.connections = [
+  { from: 'consumers', to: 'telecom',      label: 'Go online',               waypoints: [aBot('consumers'), [140,178], [177.5,178], aTop('telecom')] },
+  { from: 'consumers', to: 'app_stores',   label: 'Install apps',            waypoints: [aBot('consumers'), [140,183], [388.5,183], aTop('app_stores')] },
+  { from: 'consumers', to: 'browsers',     label: 'Open web',                waypoints: [aBot('consumers'), [140,188], [599.5,188], aTop('browsers')] },
+  { from: 'app_stores', to: 'social',      label: 'Install social apps',     waypoints: [aBot('app_stores'), [388.5,274], [224,274], aTop('social')] },
+  { from: 'app_stores', to: 'messaging',   label: 'Install messaging',       waypoints: [aBot('app_stores'), [388.5,280], [344,280], aTop('messaging')] },
+  { from: 'app_stores', to: 'streaming',   label: 'Install content apps',    waypoints: [aBot('app_stores'), [388.5,266], [704,266], aTop('streaming')] },
+  { from: 'app_stores', to: 'marketplaces', label: 'Install commerce apps',  waypoints: [aLeft('app_stores'), [280,228], [280,366], [140,366], aTop('marketplaces')] },
+  { from: 'app_stores', to: 'superapps',   label: 'Install service apps',    waypoints: [aBot('app_stores'), [388.5,368], [390,368], aTop('superapps')] },
+  { from: 'browsers',   to: 'search',      label: 'Web search',              waypoints: [aBot('browsers'), [599.5,274], [104,274], aTop('search')] },
+  { from: 'browsers',   to: 'news',        label: 'Read publishers',         waypoints: [aBot('browsers'), [599.5,280], [584,280], aTop('news')] },
+  { from: 'browsers',   to: 'streaming',   label: 'Watch in browser',        waypoints: [aBot('browsers'), [599.5,286], [704,286], aTop('streaming')] },
+  { from: 'merchants',  to: 'advertising', label: 'Ad spend',                waypoints: [aBot('merchants'), [310,270], [464,270], aTop('advertising')] },
+  { from: 'enterprises', to: 'advertising', label: 'Enterprise campaigns',   waypoints: [aBot('enterprises'), [650,266], [464,266], aTop('advertising')] },
+  { from: 'consumers',  to: 'marketplaces', label: 'Direct / repeat',        waypoints: [aLeft('consumers'), [20,136], [20,382], [140,382], aTop('marketplaces')] },
+  { from: 'consumers',  to: 'superapps',   label: 'Direct / repeat',         waypoints: [aRight('consumers'), [752,136], [752,382], [390,382], aTop('superapps')] },
+  { from: 'creators',   to: 'social',      label: 'Content creation',        waypoints: [aBot('creators'), [480,276], [224,276], aTop('social')] },
+  { from: 'creators',   to: 'streaming',   label: 'Creator content',         waypoints: [aRight('creators'), [766,136], [766,290], [704,290], aTop('streaming')] },
+  { from: 'creators',   to: 'social_commerce', label: 'Creator affiliate',   waypoints: [aRight('creators'), [760,136], [760,382], [650,382], aTop('social_commerce')] },
+  { from: 'search',     to: 'news',        label: 'News lookup',             waypoints: [aRight('search'), [166,282], [584,282], aTop('news')], lateral: true },
+  { from: 'search',     to: 'marketplaces', label: 'Product search',         waypoints: [aBot('search'), [104,366], [140,366], aTop('marketplaces')] },
+  { from: 'search',     to: 'superapps',   label: 'Maps discovery',          waypoints: [aBot('search'), [104,360], [390,360], aTop('superapps')] },
+  { from: 'social',     to: 'marketplaces', label: 'Social referral',        waypoints: [aBot('social'), [224,356], [140,356], aTop('marketplaces')] },
+  { from: 'social',     to: 'superapps',   label: 'Content to commerce',     waypoints: [aBot('social'), [224,364], [390,364], aTop('superapps')] },
+  { from: 'social',     to: 'social_commerce', label: 'In-app shops',        waypoints: [aBot('social'), [224,372], [650,372], aTop('social_commerce')] },
+  { from: 'messaging',  to: 'superapps',   label: 'Chat-to-service',         waypoints: [aBot('messaging'), [344,358], [390,358], aTop('superapps')] },
+  { from: 'messaging',  to: 'social_commerce', label: 'Chat commerce',       waypoints: [aBot('messaging'), [344,378], [650,378], aTop('social_commerce')] },
+  { from: 'advertising', to: 'marketplaces', label: 'Paid placement',        waypoints: [aBot('advertising'), [464,352], [140,352], aTop('marketplaces')] },
+  { from: 'advertising', to: 'superapps',  label: 'App install / demand',    waypoints: [aBot('advertising'), [464,364], [390,364], aTop('superapps')] },
+  { from: 'advertising', to: 'social_commerce', label: 'Boosted listings',   waypoints: [aBot('advertising'), [464,384], [650,384], aTop('social_commerce')] },
+  { from: 'streaming',  to: 'social_commerce', label: 'Creator-led commerce', waypoints: [aBot('streaming'), [704,372], [650,372], aTop('social_commerce')] },
+  { from: 'advertising', to: 'creators',   label: 'Brand campaigns',         waypoints: [aTop('advertising'), [464,258], [752,258], [752,106], [480,106], aTop('creators')] },
+];
+
+FLOWS.money.connections = [
+  { from: 'consumers', to: 'ewallets', label: 'Top-up / pay', waypoints: [aLeft('consumers'), [36,136], [36,474], [480,474], aTop('ewallets')] },
+  { from: 'consumers', to: 'banks',    label: 'Bank transfer', waypoints: [aLeft('consumers'), [22,136], [22,471], [310,471], aTop('banks')] },
+  { from: 'consumers', to: 'cards',    label: 'Card payment', waypoints: [aRight('consumers'), [752,136], [752,474], [650,474], aTop('cards')] },
+  { from: 'marketplaces', to: 'promptpay', label: 'QR checkout', waypoints: [aBot('marketplaces'), aTop('promptpay')] },
+  { from: 'marketplaces', to: 'ewallets', label: 'Wallet checkout', waypoints: [aBot('marketplaces'), [140,462], [480,462], aTop('ewallets')] },
+  { from: 'marketplaces', to: 'cards', label: 'Card checkout', waypoints: [aBot('marketplaces'), [140,466], [650,466], aTop('cards')] },
+  { from: 'marketplaces', to: 'banks', label: 'Bank app checkout', waypoints: [aBot('marketplaces'), [140,455], [310,455], aTop('banks')] },
+  { from: 'superapps', to: 'ewallets', label: 'In-app payment', waypoints: [aBot('superapps'), [390,458], [480,458], aTop('ewallets')] },
+  { from: 'social_commerce', to: 'ewallets', label: 'Social checkout', waypoints: [aBot('social_commerce'), [650,460], [480,460], aTop('ewallets')] },
+  { from: 'streaming', to: 'cards', label: 'Subscription checkout', waypoints: [aBot('streaming'), [704,452], [650,452], aTop('cards')] },
+  { from: 'merchants', to: 'marketplaces', label: 'Seller fees / commission', waypoints: [aBot('merchants'), [310,272], [270,272], [270,360], [140,360], aTop('marketplaces')] },
+  { from: 'merchants', to: 'social_commerce', label: 'Store tools / commission', waypoints: [aBot('merchants'), [310,268], [520,268], [520,380], [650,380], aTop('social_commerce')] },
+  { from: 'streaming', to: 'app_stores', label: 'App-store commission', waypoints: [aTop('streaming'), [704,186], [388.5,186], aTop('app_stores')] },
+  { from: 'marketplaces', to: 'warehouses', label: 'Fulfillment fees', waypoints: [aRight('marketplaces'), [748,412], [748,564], [599.5,564], aTop('warehouses')] },
+  { from: 'banks', to: 'merchants', label: 'Merchant settlement', waypoints: [aLeft('banks'), [8,504], [8,106], [310,106], aTop('merchants')] },
+  { from: 'banks', to: 'creators',  label: 'Creator payout', waypoints: [aRight('banks'), [752,504], [752,106], [480,106], aTop('creators')] },
+  { from: 'banks', to: 'parcels',   label: 'Logistics fees', waypoints: [aBot('banks'), [310,550], [177.5,550], aTop('parcels')] },
+  { from: 'banks', to: 'riders',    label: 'Rider payout', waypoints: [aBot('banks'), [310,554], [388.5,554], aTop('riders')] },
+  { from: 'promptpay', to: 'banks', label: 'Interbank rails', waypoints: [aRight('promptpay'), [220,453], [310,453], aTop('banks')], lateral: true },
+  { from: 'ewallets', to: 'banks',  label: 'Float settlement', waypoints: [aLeft('ewallets'), [396,448], [310,448], aTop('banks')], lateral: true },
+  { from: 'cards',    to: 'banks',  label: 'Card acquiring', waypoints: [aLeft('cards'), [566,443], [310,443], aTop('banks')], lateral: true },
+];
+
+FLOWS.physical.connections = [
+  { from: 'marketplaces', to: 'parcels', label: 'Ship order', waypoints: [aLeft('marketplaces'), [36,412], [36,566], [177.5,566], aTop('parcels')] },
+  { from: 'marketplaces', to: 'warehouses', label: 'Fulfillment', waypoints: [aLeft('marketplaces'), [22,412], [22,566], [599.5,566], aTop('warehouses')] },
+  { from: 'superapps', to: 'riders', label: 'Dispatch rider', waypoints: [aLeft('superapps'), [8,412], [8,566], [388.5,566], aTop('riders')] },
+  { from: 'social_commerce', to: 'parcels', label: 'Ship order', waypoints: [aRight('social_commerce'), [750,412], [750,562], [177.5,562], aTop('parcels')] },
+  { from: 'social_commerce', to: 'riders', label: 'Local delivery', waypoints: [aRight('social_commerce'), [755,412], [755,558], [388.5,558], aTop('riders')] },
+  { from: 'parcels', to: 'consumers', label: 'Delivery', waypoints: [aLeft('parcels'), [36,596], [36,106], [140,106], aTop('consumers')] },
+  { from: 'riders', to: 'consumers', label: 'Last-mile', waypoints: [aLeft('riders'), [22,596], [22,103], [140,103], aTop('consumers')] },
+  { from: 'warehouses', to: 'parcels', label: 'Pack & ship', waypoints: [aLeft('warehouses'), [520,542], [177.5,542], aTop('parcels')], lateral: true },
+];
+
+FLOWS.data.connections = [
+  { from: 'ai_ml', to: 'search', label: 'Search ranking', waypoints: [aLeft('ai_ml'), [36,688], [36,290], [104,290], aTop('search')], dashed: true },
+  { from: 'ai_ml', to: 'social', label: 'Content ranking', waypoints: [aLeft('ai_ml'), [22,688], [22,290], [224,290], aTop('social')], dashed: true },
+  { from: 'ai_ml', to: 'marketplaces', label: 'Recommendations', waypoints: [aLeft('ai_ml'), [8,688], [8,382], [140,382], aTop('marketplaces')], dashed: true },
+  { from: 'ai_ml', to: 'advertising', label: 'Targeting / optimization', waypoints: [aLeft('ai_ml'), [52,688], [52,290], [464,290], aTop('advertising')], dashed: true },
+  { from: 'consumers', to: 'cloud', label: 'Behavior / identity data', waypoints: [aLeft('consumers'), [64,136], [64,746], [229,746], aTop('cloud')] },
+  { from: 'merchants', to: 'cloud', label: 'Catalog / seller data', waypoints: [aBot('merchants'), [310,734], [234,734], aTop('cloud')] },
+  { from: 'creators', to: 'cloud', label: 'Content / audience data', waypoints: [aBot('creators'), [480,730], [239,730], aTop('cloud')] },
+  { from: 'marketplaces', to: 'cloud', label: 'Transaction data', waypoints: [aRight('marketplaces'), [750,412], [750,750], [244,750], aTop('cloud')] },
+  { from: 'social', to: 'cloud', label: 'Engagement data', waypoints: [aRight('social'), [755,320], [755,748], [249,748], aTop('cloud')] },
+  { from: 'promptpay', to: 'cloud', label: 'Payment data', waypoints: [aRight('promptpay'), [745,504], [745,744], [254,744], aTop('cloud')] },
+  { from: 'enterprises', to: 'cloud', label: 'Enterprise workloads', waypoints: [aRight('enterprises'), [760,136], [760,742], [259,742], aTop('cloud')] },
+  { from: 'advertising', to: 'cloud', label: 'Ad & audience data', waypoints: [aRight('advertising'), [740,320], [740,740], [264,740], aTop('cloud')] },
+  { from: 'superapps', to: 'cloud', label: 'Location & txn data', waypoints: [aRight('superapps'), [747,412], [747,738], [269,738], aTop('cloud')] },
+  { from: 'streaming', to: 'cloud', label: 'Viewing data', waypoints: [aRight('streaming'), [735,320], [735,736], [274,736], aTop('cloud')] },
+  { from: 'social_commerce', to: 'cloud', label: 'Commerce data', waypoints: [aRight('social_commerce'), [730,412], [730,734], [279,734], aTop('cloud')] },
+  { from: 'cloud', to: 'ai_ml', label: 'Compute / model serving', waypoints: [[300,752], [300,734], [405,734], [405,716]] },
+  { from: 'cloud', to: 'cdn', label: 'Content delivery', waypoints: [aRight('cloud'), [380,738], [554,738], aTop('cdn')], lateral: true },
+];
+
 // Compute FLOW_NODES
 const FLOW_NODES = {};
 Object.entries(FLOWS).forEach(([name, flow]) => {
@@ -413,6 +514,10 @@ const TOOLTIPS = {
   cdn:             'Cloudflare. Akamai. Local data centers: INET, TRUE IDC, NT (formerly CAT).',
 };
 
+TOOLTIPS.app_stores = 'Mobile app distribution: Apple App Store. Google Play Store. Huawei AppGallery. Samsung Galaxy Store.';
+TOOLTIPS.browsers = 'Chrome (dominant). Safari. Samsung Internet. Firefox. In-app browsers.';
+TOOLTIPS.streaming = 'YouTube (dominant video discovery). Netflix. MONOMAX (Thai). Viu. Disney+ Hotstar. WeTV.';
+
 let activeFlowName = 'discovery';
 const hitLayer = document.getElementById('hit-layer');
 const labelLayer = document.getElementById('label-layer');
@@ -445,7 +550,23 @@ function buildInteractionLayers() {
       const lText = createSVGEl('text', { 'text-anchor': 'middle', 'font-family': 'DM Sans, sans-serif', 'font-size': '10', 'font-weight': '500', fill: flow.color, x: lx, y: ly + 3.5 });
       lText.textContent = conn.label;
       lg.appendChild(lRect); lg.appendChild(lText); labelLayer.appendChild(lg);
-      requestAnimationFrame(() => { const bbox = lText.getBBox(); lRect.setAttribute('x', bbox.x - 4); lRect.setAttribute('y', bbox.y - 2); lRect.setAttribute('width', bbox.width + 8); lRect.setAttribute('height', bbox.height + 4); });
+      requestAnimationFrame(() => {
+        const clampMinX = 12, clampMaxX = 768, clampMinY = 12, clampMaxY = 848;
+        let bbox = lText.getBBox();
+        let nextX = parseFloat(lText.getAttribute('x'));
+        let nextY = parseFloat(lText.getAttribute('y'));
+        if (bbox.x < clampMinX) nextX += clampMinX - bbox.x;
+        if (bbox.x + bbox.width > clampMaxX) nextX -= (bbox.x + bbox.width) - clampMaxX;
+        if (bbox.y < clampMinY) nextY += clampMinY - bbox.y;
+        if (bbox.y + bbox.height > clampMaxY) nextY -= (bbox.y + bbox.height) - clampMaxY;
+        lText.setAttribute('x', nextX);
+        lText.setAttribute('y', nextY);
+        bbox = lText.getBBox();
+        lRect.setAttribute('x', bbox.x - 4);
+        lRect.setAttribute('y', bbox.y - 2);
+        lRect.setAttribute('width', bbox.width + 8);
+        lRect.setAttribute('height', bbox.height + 4);
+      });
     });
   });
 }
@@ -575,6 +696,10 @@ const MOBILE_SUMMARIES = {
   data: 'Platform data flows down to cloud infrastructure. AI intelligence feeds up to enhance search, social, and commerce.',
 };
 
+MOBILE_SUMMARIES.discovery = 'App stores and browsers feed search, social, news, and streaming, which convert into marketplaces, super-apps, and social commerce.';
+MOBILE_SUMMARIES.money = 'Consumers pay through banks, wallets, and cards. Merchants pay platform fees, while platforms pay app-store and fulfillment commissions.';
+MOBILE_SUMMARIES.data = 'Participant and platform data accumulates in cloud infrastructure. AI feeds ranking, targeting, and recommendations back into the journey.';
+
 const LAYER_DATA = [
   { label: 'PARTICIPANTS', color: '#534AB7', nodes: ['consumers','merchants','creators','enterprises'] },
   { label: 'ACCESS', color: '#BA7517', nodes: ['telecom','app_stores','browsers'] },
@@ -585,6 +710,10 @@ const LAYER_DATA = [
   { label: 'INTELLIGENCE', color: '#7C3AED', nodes: ['ai_ml'] },
   { label: 'DIGITAL INFRASTRUCTURE', color: '#185FA5', nodes: ['cloud','cdn'] },
 ];
+
+LAYER_DATA[2].label = 'DISCOVERY & CONTENT';
+LAYER_DATA[2].nodes = ['search','social','messaging','advertising','news','streaming'];
+LAYER_DATA[3].nodes = ['marketplaces','superapps','social_commerce'];
 
 const mobileView = document.getElementById('mobile-view');
 LAYER_DATA.forEach(layer => {
