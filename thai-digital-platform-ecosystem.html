@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thailand Digital Platform Ecosystem — Value Flow Maps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FAFAF8;--bg2:#F2F1ED;--bg-card:#FFF;--tx:#1A1A18;--tx2:#6B6A65;--tx3:#9C9B95;--bd:rgba(0,0,0,0.08);--bd2:rgba(0,0,0,0.15);--radius:12px;--radius-sm:8px;--font:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#1A1A18;--bg2:#242422;--bg-card:#2C2C2A;--tx:#E8E6DE;--tx2:#A8A7A0;--tx3:#6B6A65;--bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.15)}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 20px 60px}
+.page-header{text-align:center;max-width:620px;margin-bottom:28px}
+.page-header h1{font-size:21px;font-weight:600;letter-spacing:-0.02em;margin-bottom:6px}
+.page-header p{font-size:12.5px;color:var(--tx2);line-height:1.6}
+.container{width:100%;max-width:800px}
+.platform-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;justify-content:center}
+.pnav-btn{font-size:11.5px;padding:6px 14px;border-radius:22px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--font);font-weight:500;transition:all 0.15s;white-space:nowrap}
+.pnav-btn:hover{border-color:var(--tx3)}
+.pnav-btn.active{color:#fff;border-color:transparent}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.toolbar-label{font-size:11px;color:var(--tx3);font-weight:500;letter-spacing:0.03em;text-transform:uppercase}
+.tb-btn{font-size:11.5px;padding:4px 13px;border-radius:20px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--font);font-weight:500;transition:all 0.15s}
+.tb-btn:hover{border-color:var(--tx3)}
+.tb-btn.active{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.diagram{position:relative}
+.columns{display:grid;grid-template-columns:155px minmax(0,1fr) 155px;gap:18px;align-items:start}
+@media(max-width:700px){.columns{grid-template-columns:1fr;gap:12px}.col-left{padding-top:0!important;flex-direction:row!important;flex-wrap:wrap}.svg-layer{display:none}.col-center{order:-1}}
+.col{display:flex;flex-direction:column;gap:10px}
+.col-left{padding-top:50px}
+.col-right{gap:9px}
+.grp{border:1px solid var(--bd);border-radius:var(--radius);padding:10px 12px 10px 16px;background:var(--bg-card);position:relative;overflow:hidden;transition:border-color 0.2s}
+.grp:hover{border-color:var(--bd2)}
+.grp-bar{position:absolute;left:0;top:0;bottom:0;width:3.5px;border-radius:2px 0 0 2px}
+.grp-name{font-size:11.5px;font-weight:600;line-height:1.3}
+.grp-desc{font-size:10px;color:var(--tx2);line-height:1.5;margin-top:3px}
+.grp-details{display:none;margin-top:6px;border-top:1px solid var(--bd);padding-top:6px}
+.grp-details.open{display:block}
+.grp-entity{font-size:10px;color:var(--tx2);padding:2px 0;display:flex;align-items:center;gap:5px}
+.grp-entity .d{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.grp-sub{font-size:9.5px;font-weight:600;margin:5px 0 2px}
+.hub{background:var(--bg2);border-radius:16px;border:1px solid var(--bd);padding:14px}
+.hub-title{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:0.07em;text-transform:uppercase;margin-bottom:12px}
+.hub-footer{font-size:9px;color:var(--tx3);margin-top:12px;text-align:center;letter-spacing:0.02em}
+.unit{background:var(--bg-card);border:1px solid var(--bd);border-radius:var(--radius-sm);padding:9px 12px;transition:border-color 0.2s;cursor:default}
+.unit+.unit{margin-top:7px}
+.unit:hover{border-color:var(--bd2)}
+.unit.hl{box-shadow:0 0 0 1px rgba(232,93,48,0.12)}
+.unit-name{font-size:11.5px;font-weight:600}
+.unit-desc{font-size:9.5px;color:var(--tx2);margin-top:1px;line-height:1.4}
+.svg-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:visible}
+.svg-layer svg{width:100%;height:100%;overflow:visible}
+.conn{fill:none;stroke-width:1.2;opacity:0.2;transition:all 0.25s;stroke-linecap:round}
+.conn.hl{stroke-width:2;opacity:0.8}
+.conn.dim{opacity:0.03}
+.conn-hit{fill:none;stroke:transparent;stroke-width:16;cursor:pointer}
+.ftag-g{pointer-events:none;opacity:0;transition:opacity 0.2s}
+.ftag-g.show{opacity:1}
+.ftag{font-size:9px;font-family:var(--font);font-weight:600}
+.tip{position:absolute;background:var(--bg-card);border:1px solid var(--bd2);border-radius:var(--radius-sm);padding:9px 13px;font-size:11px;font-family:var(--font);color:var(--tx);line-height:1.6;pointer-events:none;z-index:30;max-width:220px;opacity:0;transition:opacity 0.15s;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.tip.show{opacity:1}
+.tip-title{font-weight:600;margin-bottom:4px;font-size:11.5px}
+.tip-dir{display:inline-block;font-size:9px;padding:2px 7px;border-radius:5px;font-weight:600;margin-bottom:4px}
+.tip-note{font-size:10px;color:var(--tx2);margin-top:2px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:10.5px;color:var(--tx2);margin-top:14px;padding:4px 0}
+.legend-item{display:flex;align-items:center;gap:5px}
+.footer{margin-top:36px;text-align:center;font-size:10.5px;color:var(--tx3);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page-header">
+<h1>Thailand digital platform ecosystem — value flow maps</h1>
+<p>Qualitative mapping of money flows between major digital platforms and their direct counterparties in the Thai market.</p>
+</div>
+<div class="container">
+<div class="platform-nav" id="platformNav"></div>
+<div class="toolbar">
+<span class="toolbar-label">Detail</span>
+<button class="tb-btn active" id="btnSummary" onclick="setView('summary')">Summary</button>
+<button class="tb-btn" id="btnExpanded" onclick="setView('expanded')">Expanded</button>
+</div>
+<div class="diagram" id="diagram">
+<div class="columns" id="cols"></div>
+<div class="svg-layer"><svg id="svg"><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M2 1.5L8 5L2 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs></svg></div>
+<div class="tip" id="tip"></div>
+</div>
+<div class="legend">
+<div class="legend-item"><svg width="28" height="12"><line x1="4" y1="6" x2="24" y2="6" stroke="#639922" stroke-width="1.5" marker-end="url(#ah)"/></svg>Inflow</div>
+<div class="legend-item"><svg width="28" height="12"><line x1="4" y1="6" x2="24" y2="6" stroke="#993556" stroke-width="1.5" marker-end="url(#ah)"/></svg>Outflow</div>
+<div class="legend-item"><svg width="34" height="12"><line x1="6" y1="6" x2="28" y2="6" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="4 2.5" marker-start="url(#ah)" marker-end="url(#ah)"/></svg>Bidirectional</div>
+</div>
+</div>
+<div class="footer">Thailand digital platform value flow maps &middot; Qualitative &middot; For analytical purposes only</div>
+
+<script>
+const DATA = {
+shopee: {
+  name: 'Shopee', parent: 'Sea Group', color: '#D85A30',
+  units: [
+    {id:'marketplace',name:'Marketplace',desc:'Core e-commerce: listings, search, checkout, Shopee Mall, seller tools'},
+    {id:'financial',name:'Financial services',desc:'ShopeePay e-wallet, ShopeePay Later (BNPL), Shopee Coins, installments'},
+    {id:'ads',name:'Shopee Ads',desc:'Sponsored search, discovery, affiliate program'},
+    {id:'spx',name:'SPX Express',desc:'Own logistics: first/last mile, sorting, subcontracting overflow'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'Purchase spend (GMV), wallet top-ups, BNPL repayments',entities:[]},
+    {id:'sellers',color:'#639922',name:'Sellers',desc:'Commission (2-6%), sponsored listings, keyword ads',entities:[]},
+  ],
+  right: [
+    {id:'banks',color:'#0F6E56',name:'Banks & payments',desc:'Processing fees, credit facilities, payment rails',subs:[
+      {label:'Thai commercial banks',color:'#0F6E56',items:['KBank','SCB','Bangkok Bank','Krungsri','UOB · TTB']},
+      {label:'Payment networks',color:'#5DCAA5',items:['PromptPay (BOT)','Visa / Mastercard','Thai QR standard']}
+    ]},
+    {id:'traffic',color:'#993556',name:'Traffic & distribution',desc:'User acquisition, app store commissions',subs:[
+      {label:'Ad platforms',color:'#993556',items:['Meta (FB / IG)','Google Ads','TikTok','LINE Thailand']},
+      {label:'App gatekeepers',color:'#ED93B1',items:['Apple App Store','Google Play Store']}
+    ]},
+    {id:'cloud',color:'#185FA5',name:'Cloud & AI',desc:'Compute, CDN, ML services',subs:[
+      {label:'Infrastructure',color:'#185FA5',items:['AWS (EC2, S3, RDS)','Cloudflare (CDN)']},
+      {label:'AI / ML',color:'#85B7EB',items:['AWS SageMaker','Google Cloud AI']}
+    ]},
+    {id:'logistics',color:'#BA7517',name:'Logistics partners',desc:'Per-parcel delivery, last-mile fulfillment',subs:[
+      {label:null,color:'#EF9F27',items:['Kerry Express','Flash Express','J&T Express','Thailand Post','Ninja Van']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'marketplace',label:'Purchase GMV',dir:'in',color:'#534AB7',note:'Consumer spending flows through Marketplace as gross merchandise value'},
+    {fromGrp:'consumers',toUnit:'financial',label:'Wallet & BNPL',dir:'in',color:'#534AB7',note:'Wallet top-ups to ShopeePay, installment repayments for PayLater'},
+    {fromGrp:'sellers',toUnit:'marketplace',label:'Commissions',dir:'in',color:'#639922',note:'2-6% take rate per transaction, varies by category and Mall status'},
+    {fromGrp:'sellers',toUnit:'ads',label:'Ad spend',dir:'in',color:'#639922',note:'Sellers purchase sponsored search, discovery ads, keyword placements'},
+    {fromUnit:'financial',toGrp:'banks',label:'Processing & credit',dir:'both',color:'#0F6E56',note:'Out: processing fees, interchange. In: BNPL credit facilities from partner banks'},
+    {fromUnit:'marketplace',toGrp:'traffic',label:'Traffic acquisition',dir:'out',color:'#993556',note:'Ad spend on Meta, Google, TikTok, LINE. App Store/Play commissions (15-30%)'},
+    {fromUnit:'marketplace',toGrp:'cloud',label:'Compute & ML',dir:'out',color:'#185FA5',note:'AWS EC2/S3/RDS, Cloudflare CDN, SageMaker for recommendation and search ranking'},
+    {fromUnit:'marketplace',toGrp:'logistics',label:'Fulfillment fees',dir:'out',color:'#BA7517',note:'Per-parcel fees to Kerry, Flash, J&T, Thailand Post for delivery'},
+    {fromUnit:'spx',toGrp:'logistics',label:'Subcontracting',dir:'out',color:'#BA7517',note:'SPX subcontracts last-mile overflow to third-party carriers'},
+  ]
+},
+
+line: {
+  name: 'LINE', parent: 'LY Corp', color: '#06C755',
+  units: [
+    {id:'messenger',name:'LINE Messenger',desc:'Core chat, stickers, VOOM timeline, group features'},
+    {id:'oa',name:'Official Account & Business',desc:'Business messaging, CRM tools, LINE API, chatbots'},
+    {id:'lineads',name:'LINE Ads Platform',desc:'Display ads, sponsored stickers, smart channel'},
+    {id:'rabbitpay',name:'Rabbit LINE Pay',desc:'E-wallet (JV with BTS/Rabbit), QR payments, transit'},
+    {id:'shopping',name:'LINE Shopping / MyShop',desc:'Social commerce, seller storefronts, affiliate'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'Sticker purchases, LINE Pay top-ups, LINE MELODY',entities:[]},
+    {id:'businesses',color:'#639922',name:'Businesses',desc:'OA subscription fees, ad spend, sponsored stickers',entities:[]},
+  ],
+  right: [
+    {id:'banks',color:'#0F6E56',name:'Banks & payments',desc:'Payment processing, settlement, lending partnerships',subs:[
+      {label:'Key bank partner',color:'#0F6E56',items:['KBank (LINE BK deep partnership)']},
+      {label:'Other banks & rails',color:'#5DCAA5',items:['SCB','Bangkok Bank','PromptPay','Visa / Mastercard']}
+    ]},
+    {id:'bts',color:'#7F77DD',name:'BTS / Rabbit Group',desc:'JV partner for Rabbit LINE Pay, transit integration',subs:[
+      {label:null,color:'#7F77DD',items:['BTS Group Holdings','Rabbit Card system','Transit payment network']}
+    ]},
+    {id:'content',color:'#993556',name:'Content partners',desc:'Sticker creators, music labels, content licensing',subs:[
+      {label:null,color:'#D4537E',items:['Sticker creators (revenue share)','Music labels (LINE MELODY)','News publishers']}
+    ]},
+    {id:'cloud',color:'#185FA5',name:'Cloud & infra',desc:'Compute, data centers, CDN',subs:[
+      {label:null,color:'#378ADD',items:['LY Corp / Yahoo Japan infra','AWS (supplementary)','Thai ISPs (peering)']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'messenger',label:'Sticker & coin purchases',dir:'in',color:'#534AB7',note:'Users buy stickers, emoji, and LINE Coins for in-app content'},
+    {fromGrp:'consumers',toUnit:'rabbitpay',label:'Wallet top-ups',dir:'in',color:'#534AB7',note:'Rabbit LINE Pay top-ups, transit card loads, peer transfers'},
+    {fromGrp:'businesses',toUnit:'oa',label:'OA subscriptions',dir:'in',color:'#639922',note:'Monthly fees for Official Accounts, premium messaging, CRM tools'},
+    {fromGrp:'businesses',toUnit:'lineads',label:'Ad spend',dir:'in',color:'#639922',note:'Display ads, sponsored stickers, smart channel placements'},
+    {fromUnit:'rabbitpay',toGrp:'banks',label:'Processing & LINE BK',dir:'both',color:'#0F6E56',note:'Out: processing fees. In: KBank provides banking license and credit for LINE BK'},
+    {fromUnit:'rabbitpay',toGrp:'bts',label:'JV revenue share',dir:'both',color:'#7F77DD',note:'Transit payment settlement, joint venture profit/cost sharing with Rabbit Group'},
+    {fromUnit:'messenger',toGrp:'content',label:'Creator payouts',dir:'out',color:'#993556',note:'Revenue share to sticker creators, music licensing fees to labels'},
+    {fromUnit:'messenger',toGrp:'cloud',label:'Compute & CDN',dir:'out',color:'#185FA5',note:'Messaging infrastructure, media delivery, data processing'},
+  ]
+},
+
+google: {
+  name: 'Google', parent: 'Alphabet', color: '#4285F4',
+  units: [
+    {id:'search',name:'Search & Maps',desc:'Search engine, local listings, Google Maps Platform APIs'},
+    {id:'youtube',name:'YouTube',desc:'Video platform, Premium subscriptions, YouTube Music'},
+    {id:'googleads',name:'Google Ads',desc:'Search ads, Display Network, YouTube ads, Performance Max'},
+    {id:'gcp',name:'Google Cloud (GCP)',desc:'Compute, BigQuery, Vertex AI, enterprise solutions'},
+    {id:'play',name:'Google Play & Android',desc:'App distribution, Play Billing, Android OS ecosystem'},
+    {id:'ai',name:'Google AI',desc:'Gemini, AI Overviews, Translate, AI ad targeting, Bard'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'YouTube Premium, Play Store purchases, Google One storage',entities:[]},
+    {id:'advertisers',color:'#639922',name:'Advertisers',desc:'Thai businesses, agencies, platforms buying search & display ads',entities:[]},
+  ],
+  right: [
+    {id:'publishers',color:'#993556',name:'Publishers & creators',desc:'YouTube creator payouts, AdSense publisher share',subs:[
+      {label:null,color:'#D4537E',items:['Thai YouTube creators','AdSense publishers','News publishers (Google News)']}
+    ]},
+    {id:'telcos',color:'#BA7517',name:'Telcos & carriers',desc:'Carrier billing, Android distribution, peering',subs:[
+      {label:null,color:'#EF9F27',items:['True Corp','AIS','carrier billing (Play Store)','ISP peering / edge caching']}
+    ]},
+    {id:'developers',color:'#185FA5',name:'App developers',desc:'Play Store revenue share, API consumption',subs:[
+      {label:null,color:'#378ADD',items:['Thai app developers (70/30 split)','Enterprise GCP customers','Maps API consumers']}
+    ]},
+    {id:'cloud_cost',color:'#0F6E56',name:'Local infra & data',desc:'Thai data center, submarine cable, edge nodes',subs:[
+      {label:null,color:'#0F6E56',items:['Thai data center operations','CAT Telecom / NT (cable landing)','Edge cache nodes']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'youtube',label:'Premium & purchases',dir:'in',color:'#534AB7',note:'YouTube Premium, Music subs, Google One, Play Store app/content purchases'},
+    {fromGrp:'consumers',toUnit:'play',label:'App & content spend',dir:'in',color:'#534AB7',note:'In-app purchases, app downloads, Play Pass subscriptions'},
+    {fromGrp:'advertisers',toUnit:'googleads',label:'Ad revenue',dir:'in',color:'#639922',note:'Search ads, Display Network, YouTube ads. Dominant revenue source in Thailand'},
+    {fromUnit:'youtube',toGrp:'publishers',label:'Creator payouts',dir:'out',color:'#993556',note:'YouTube Partner Program revenue share (55/45), AdSense payments to Thai publishers'},
+    {fromUnit:'play',toGrp:'telcos',label:'Carrier billing share',dir:'both',color:'#BA7517',note:'DCB revenue share with True/AIS, Android pre-installation deals'},
+    {fromUnit:'gcp',toGrp:'developers',label:'Cloud & API revenue',dir:'both',color:'#185FA5',note:'In: GCP consumption by Thai enterprises. Out: Play Store 70/30 revenue share to devs'},
+    {fromUnit:'search',toGrp:'cloud_cost',label:'Infra spend',dir:'out',color:'#0F6E56',note:'Thai data center operations, submarine cable consortium fees, ISP peering'},
+    {fromUnit:'ai',toGrp:'developers',label:'AI API consumption',dir:'both',color:'#185FA5',note:'Vertex AI, Gemini API usage by Thai developers and enterprises'},
+  ]
+},
+
+meta: {
+  name: 'Meta', parent: 'Meta Platforms', color: '#0081FB',
+  units: [
+    {id:'facebook',name:'Facebook',desc:'Feed, groups, Marketplace, pages, events'},
+    {id:'instagram',name:'Instagram',desc:'Feed, stories, reels, shopping, creators'},
+    {id:'whatsapp',name:'WhatsApp',desc:'Messaging, WhatsApp Business, channels'},
+    {id:'metaads',name:'Meta Ads',desc:'Unified ad platform: FB/IG/WA/Audience Network, Advantage+'},
+    {id:'metaai',name:'Meta AI',desc:'AI feed ranking, AI chatbot, Llama models, Advantage+ AI targeting'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'Stars, subscriptions, in-app purchases (minimal)',entities:[]},
+    {id:'advertisers',color:'#639922',name:'Advertisers',desc:'Thai brands, agencies, e-commerce platforms (dominant revenue)',entities:[]},
+  ],
+  right: [
+    {id:'creators',color:'#993556',name:'Creators & publishers',desc:'Creator fund, in-stream ad share, Reels bonuses',subs:[
+      {label:null,color:'#D4537E',items:['Thai content creators','News publishers','IG influencers (branded content)']}
+    ]},
+    {id:'telcos',color:'#BA7517',name:'Telcos & ISPs',desc:'Zero-rating, peering, Free Basics',subs:[
+      {label:null,color:'#EF9F27',items:['True Corp','AIS','Thai ISPs (CDN peering)','Free Basics partnerships']}
+    ]},
+    {id:'cloud',color:'#185FA5',name:'Data center & infra',desc:'Own data centers, Thai edge/cache infrastructure',subs:[
+      {label:null,color:'#378ADD',items:['Meta-owned data centers','Thai edge caching nodes','Submarine cable investments']}
+    ]},
+    {id:'payment',color:'#0F6E56',name:'Payment partners',desc:'FB Marketplace, IG Shopping checkout (limited in TH)',subs:[
+      {label:null,color:'#0F6E56',items:['Payment gateways','Thai banks (limited integration)','PromptPay (emerging)']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'facebook',label:'Stars & tips',dir:'in',color:'#534AB7',note:'Minimal direct consumer revenue: Stars for creators, avatar purchases'},
+    {fromGrp:'advertisers',toUnit:'metaads',label:'Ad revenue',dir:'in',color:'#639922',note:'Dominant revenue: FB/IG ads, Advantage+ campaigns, Audience Network. Bulk of Thai digital ad market'},
+    {fromUnit:'metaads',toGrp:'creators',label:'Creator payouts',dir:'out',color:'#993556',note:'In-stream ad revenue share, Reels Play bonuses, creator fund distributions'},
+    {fromUnit:'metaai',toGrp:'creators',label:'AI-powered distribution',dir:'out',color:'#993556',note:'AI ranking determines creator reach; algorithmic gatekeeping of Thai content visibility'},
+    {fromUnit:'facebook',toGrp:'telcos',label:'Peering & zero-rating',dir:'both',color:'#BA7517',note:'CDN peering reduces telco transit costs; zero-rating deals increase Meta reach'},
+    {fromUnit:'metaai',toGrp:'cloud',label:'AI compute',dir:'out',color:'#185FA5',note:'Massive GPU infrastructure for AI training/inference, edge caching for Thai users'},
+    {fromUnit:'instagram',toGrp:'payment',label:'Commerce processing',dir:'out',color:'#0F6E56',note:'Limited in Thailand: IG Shopping checkout, FB Marketplace payment facilitation'},
+  ]
+},
+
+grab: {
+  name: 'Grab', parent: 'Grab Holdings', color: '#00B14F',
+  units: [
+    {id:'food',name:'GrabFood',desc:'Food delivery, restaurant partnerships, dine-in'},
+    {id:'transport',name:'GrabCar / GrabBike',desc:'Ride-hailing, transport, corporate rides'},
+    {id:'grabpay',name:'GrabPay',desc:'E-wallet, payment acceptance, PayLater'},
+    {id:'express',name:'GrabExpress & GrabMart',desc:'On-demand delivery, parcels, grocery/convenience'},
+    {id:'grabai',name:'Grab AI & Data',desc:'Demand prediction, dynamic pricing, route optimization, GrabMaps'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'Ride fares, food orders, delivery fees, GrabPay top-ups',entities:[]},
+    {id:'merchants',color:'#639922',name:'Restaurants & merchants',desc:'Commission (25-35% food), GrabAds spend',entities:[]},
+  ],
+  right: [
+    {id:'drivers',color:'#BA7517',name:'Drivers & delivery',desc:'Driver payouts (largest cost line), incentives',subs:[
+      {label:null,color:'#EF9F27',items:['GrabCar drivers','GrabBike riders','GrabFood delivery partners','GrabExpress couriers']}
+    ]},
+    {id:'banks',color:'#0F6E56',name:'Banks & payments',desc:'Processing, GrabPay settlement, lending',subs:[
+      {label:'Key partner',color:'#0F6E56',items:['KBank (Grab-KBank partnership)']},
+      {label:'Other banks & rails',color:'#5DCAA5',items:['SCB','PromptPay','Visa / Mastercard']}
+    ]},
+    {id:'cloud',color:'#185FA5',name:'Cloud & mapping',desc:'AWS (major customer), mapping services',subs:[
+      {label:null,color:'#378ADD',items:['AWS (primary cloud)','GrabMaps (own mapping)','Google Maps (reducing dependency)','AI/ML inference infra']}
+    ]},
+    {id:'insurance',color:'#993556',name:'Insurance & compliance',desc:'Mandatory ride-hailing coverage',subs:[
+      {label:null,color:'#D4537E',items:['Thai insurers (driver/rider coverage)','DLT licensing fees','Accident liability pools']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'food',label:'Food orders',dir:'in',color:'#534AB7',note:'Order value including delivery fees, Grab commission deducted before merchant payout'},
+    {fromGrp:'consumers',toUnit:'transport',label:'Ride fares',dir:'in',color:'#534AB7',note:'Dynamic-priced ride fares, surge pricing during peak demand'},
+    {fromGrp:'consumers',toUnit:'grabpay',label:'Wallet top-ups',dir:'in',color:'#534AB7',note:'GrabPay wallet loads, PayLater repayments'},
+    {fromGrp:'merchants',toUnit:'food',label:'Commissions',dir:'in',color:'#639922',note:'25-35% commission on food orders, GrabAds promotional spend'},
+    {fromUnit:'food',toGrp:'drivers',label:'Delivery payouts',dir:'out',color:'#BA7517',note:'Per-delivery fees to GrabFood delivery partners, bonuses and incentives'},
+    {fromUnit:'transport',toGrp:'drivers',label:'Driver payouts',dir:'out',color:'#BA7517',note:'Fare revenue share to drivers (typically 75-80%), surge incentives'},
+    {fromUnit:'grabpay',toGrp:'banks',label:'Processing & lending',dir:'both',color:'#0F6E56',note:'Out: processing fees. In: KBank credit facilities for PayLater, co-lending'},
+    {fromUnit:'grabai',toGrp:'cloud',label:'Compute & mapping',dir:'out',color:'#185FA5',note:'AWS for core infra, GrabMaps development, ML model training/inference'},
+    {fromUnit:'transport',toGrp:'insurance',label:'Insurance & licensing',dir:'out',color:'#993556',note:'Mandatory ride-hailing insurance premiums, DLT licensing compliance'},
+  ]
+},
+
+truecorp: {
+  name: 'True Corp', parent: 'CP Group', color: '#E4002B',
+  units: [
+    {id:'mobile',name:'True Mobile',desc:'Largest Thai mobile operator (post-DTAC merger), 5G'},
+    {id:'online',name:'True Online',desc:'Fiber broadband, enterprise connectivity, SD-WAN'},
+    {id:'visions',name:'True Visions / TrueID',desc:'Pay TV, streaming, digital content platform'},
+    {id:'truemoney',name:'TrueMoney',desc:'E-wallet, financial services (Ascend Money subsidiary)'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'Mobile subs, broadband, TV packages, TrueMoney transactions',entities:[]},
+    {id:'enterprise',color:'#639922',name:'Enterprise clients',desc:'Corporate mobile, connectivity, cloud/ICT solutions',entities:[]},
+  ],
+  right: [
+    {id:'equipment',color:'#185FA5',name:'Equipment vendors',desc:'Network infrastructure, massive capex',subs:[
+      {label:null,color:'#378ADD',items:['Huawei','Ericsson','Nokia','Cisco (enterprise)']}
+    ]},
+    {id:'content',color:'#993556',name:'Content providers',desc:'Studios, sports rights, international content',subs:[
+      {label:null,color:'#D4537E',items:['HBO / Warner Bros.','Netflix (partnership)','Sports rights holders','Thai studios & producers']}
+    ]},
+    {id:'nbtc',color:'#BA7517',name:'NBTC & spectrum',desc:'Spectrum licenses, regulatory obligations',subs:[
+      {label:null,color:'#EF9F27',items:['Spectrum license fees (billions THB)','USO contributions','Regulatory compliance costs']}
+    ]},
+    {id:'banks',color:'#0F6E56',name:'Banks & financial',desc:'TrueMoney settlement, lending, corporate finance',subs:[
+      {label:null,color:'#0F6E56',items:['Partner banks (TrueMoney settlement)','Corporate bond market','CP Group treasury']}
+    ]},
+    {id:'carriers',color:'#7F77DD',name:'Int\'l carriers & cable',desc:'Roaming, interconnection, submarine cables',subs:[
+      {label:null,color:'#7F77DD',items:['International roaming partners','Submarine cable consortia','CAT/NT interconnection']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'mobile',label:'Mobile subscriptions',dir:'in',color:'#534AB7',note:'Prepaid/postpaid mobile revenue, largest revenue line'},
+    {fromGrp:'consumers',toUnit:'online',label:'Broadband subs',dir:'in',color:'#534AB7',note:'Fiber broadband monthly fees, installation revenue'},
+    {fromGrp:'consumers',toUnit:'truemoney',label:'Wallet transactions',dir:'in',color:'#534AB7',note:'TrueMoney top-ups, bill payments, merchant fees'},
+    {fromGrp:'enterprise',toUnit:'mobile',label:'Corporate mobile & ICT',dir:'in',color:'#639922',note:'Enterprise mobile plans, IoT connectivity, managed services'},
+    {fromUnit:'mobile',toGrp:'equipment',label:'Network capex',dir:'out',color:'#185FA5',note:'Massive 5G/4G network equipment spend: Huawei, Ericsson, Nokia'},
+    {fromUnit:'visions',toGrp:'content',label:'Content licensing',dir:'out',color:'#993556',note:'Rights fees to HBO, sports leagues, Thai studios for TrueVisions/TrueID content'},
+    {fromUnit:'mobile',toGrp:'nbtc',label:'Spectrum & regulation',dir:'out',color:'#BA7517',note:'Spectrum license installments, USO fund contributions, regulatory fees'},
+    {fromUnit:'truemoney',toGrp:'banks',label:'Settlement & lending',dir:'both',color:'#0F6E56',note:'Out: settlement processing. In: banking partnerships, credit facilities'},
+    {fromUnit:'mobile',toGrp:'carriers',label:'Interconnection',dir:'both',color:'#7F77DD',note:'International roaming revenue share, submarine cable consortium fees'},
+  ]
+},
+
+tiktok: {
+  name: 'TikTok', parent: 'ByteDance', color: '#010101',
+  units: [
+    {id:'video',name:'TikTok (short video)',desc:'Core content platform, For You Page, LIVE streaming'},
+    {id:'shop',name:'TikTok Shop',desc:'In-app e-commerce, affiliate program, seller marketplace'},
+    {id:'ttads',name:'TikTok Ads',desc:'In-feed ads, branded effects, TopView, Spark Ads'},
+    {id:'creator',name:'Creator ecosystem',desc:'Creator fund, LIVE gifts, creator marketplace'},
+    {id:'ttai',name:'TikTok AI / Algorithm',desc:'FYP recommendation engine, content moderation, AI effects/filters'},
+  ],
+  left: [
+    {id:'consumers',color:'#534AB7',name:'Consumers',desc:'TikTok Coins (LIVE gifts), TikTok Shop purchases',entities:[]},
+    {id:'advertisers',color:'#639922',name:'Advertisers & sellers',desc:'Ad placements, TikTok Shop commissions, branded content',entities:[]},
+  ],
+  right: [
+    {id:'creators',color:'#993556',name:'Creators',desc:'Creator fund, LIVE gift share, affiliate commissions',subs:[
+      {label:null,color:'#D4537E',items:['Thai content creators','LIVE streamers','TikTok Shop affiliates','Creator fund recipients']}
+    ]},
+    {id:'logistics',color:'#BA7517',name:'Logistics partners',desc:'TikTok Shop fulfillment',subs:[
+      {label:null,color:'#EF9F27',items:['Kerry Express','Flash Express','J&T Express','Thailand Post']}
+    ]},
+    {id:'banks',color:'#0F6E56',name:'Banks & payments',desc:'TikTok Shop checkout, Coins purchase processing',subs:[
+      {label:null,color:'#0F6E56',items:['Thai banks (payment acceptance)','PromptPay','Visa / Mastercard','TrueMoney']}
+    ]},
+    {id:'cloud',color:'#185FA5',name:'Cloud & infra',desc:'ByteDance infra, CDN, AI compute',subs:[
+      {label:null,color:'#378ADD',items:['ByteDance own infrastructure','CDN providers (Thai PoPs)','GPU clusters (AI training)']}
+    ]},
+    {id:'music',color:'#7F77DD',name:'Music & rights',desc:'Music catalog licensing for platform content',subs:[
+      {label:null,color:'#7F77DD',items:['Universal Music Group','Sony Music','Warner Music','GMM Grammy (Thai)']}
+    ]},
+  ],
+  flows: [
+    {fromGrp:'consumers',toUnit:'video',label:'Coins & LIVE gifts',dir:'in',color:'#534AB7',note:'TikTok Coin purchases used for LIVE gifts and creator tips'},
+    {fromGrp:'consumers',toUnit:'shop',label:'Shop purchases',dir:'in',color:'#534AB7',note:'Product purchases through TikTok Shop integrated checkout'},
+    {fromGrp:'advertisers',toUnit:'ttads',label:'Ad revenue',dir:'in',color:'#639922',note:'In-feed ads, TopView, Spark Ads, branded effects from Thai brands and agencies'},
+    {fromGrp:'advertisers',toUnit:'shop',label:'Shop commissions',dir:'in',color:'#639922',note:'Seller commissions on TikTok Shop transactions, affiliate fees'},
+    {fromUnit:'creator',toGrp:'creators',label:'Creator payouts',dir:'out',color:'#993556',note:'Creator fund, LIVE gift revenue share (typically 50-70%), affiliate commissions'},
+    {fromUnit:'shop',toGrp:'logistics',label:'Fulfillment fees',dir:'out',color:'#BA7517',note:'Per-parcel delivery fees for TikTok Shop orders'},
+    {fromUnit:'shop',toGrp:'banks',label:'Payment processing',dir:'out',color:'#0F6E56',note:'Transaction processing fees for TikTok Shop and Coins purchases'},
+    {fromUnit:'ttai',toGrp:'cloud',label:'AI compute & CDN',dir:'out',color:'#185FA5',note:'Massive compute for FYP recommendation, content moderation, video delivery CDN'},
+    {fromUnit:'video',toGrp:'music',label:'Music licensing',dir:'out',color:'#7F77DD',note:'Licensing fees to UMG, Sony, Warner, GMM Grammy for platform music catalog'},
+  ]
+}
+};
+
+let activePlatform = 'shopee';
+let currentView = 'summary';
+let hoverIdx = null;
+
+function renderNav(){
+  const nav = document.getElementById('platformNav');
+  const colors = {shopee:'#D85A30',line:'#06C755',google:'#4285F4',meta:'#0081FB',grab:'#00B14F',truecorp:'#E4002B',tiktok:'#333'};
+  let h = '';
+  Object.keys(DATA).forEach(k => {
+    const d = DATA[k];
+    const isActive = k === activePlatform;
+    const bg = isActive ? colors[k] : 'transparent';
+    const bdr = isActive ? colors[k] : '';
+    h += `<button class="pnav-btn${isActive?' active':''}" data-p="${k}" style="${isActive?'background:'+bg+';border-color:'+bg:''}">${d.name}</button>`;
+  });
+  nav.innerHTML = h;
+  nav.querySelectorAll('.pnav-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      activePlatform = b.dataset.p;
+      renderNav();
+      renderDiagram();
+    });
+  });
+}
+
+function renderDiagram(){
+  const d = DATA[activePlatform];
+  const cols = document.getElementById('cols');
+  let leftH = '<div class="col col-left">';
+  d.left.forEach(g => {
+    leftH += `<div class="grp" data-group="${g.id}"><div class="grp-bar" style="background:${g.color}"></div><div class="grp-name" style="color:${g.color}">${g.name}</div><div class="grp-desc">${g.desc}</div></div>`;
+  });
+  leftH += '</div>';
+
+  let centerH = '<div class="col col-center"><div class="hub"><div class="hub-title">' + d.name + (d.parent ? ' <span style="font-weight:400;opacity:0.6">(' + d.parent + ')</span>' : '') + '</div>';
+  d.units.forEach(u => {
+    centerH += `<div class="unit" data-unit="${u.id}"><div class="unit-name" style="color:${d.color}">${u.name}</div><div class="unit-desc">${u.desc}</div></div>`;
+  });
+  centerH += `<div class="hub-footer">${d.units.length} units</div></div></div>`;
+
+  let rightH = '<div class="col col-right">';
+  d.right.forEach(g => {
+    rightH += `<div class="grp" data-group="${g.id}"><div class="grp-bar" style="background:${g.color}"></div><div class="grp-name" style="color:${g.color}">${g.name}</div><div class="grp-desc">${g.desc}</div>`;
+    if(g.subs && g.subs.length){
+      rightH += '<div class="grp-details'+(currentView==='expanded'?' open':'')+ '">';
+      g.subs.forEach(s => {
+        if(s.label) rightH += `<div class="grp-sub" style="color:${s.color}">${s.label}</div>`;
+        s.items.forEach(it => {
+          rightH += `<div class="grp-entity"><span class="d" style="background:${s.color}"></span>${it}</div>`;
+        });
+      });
+      rightH += '</div>';
+    }
+    rightH += '</div>';
+  });
+  rightH += '</div>';
+
+  cols.innerHTML = leftH + centerH + rightH;
+  attachHover();
+  hoverIdx = null;
+  setTimeout(drawConns, 30);
+  setTimeout(drawConns, 150);
+}
+
+function attachHover(){
+  document.querySelectorAll('.grp').forEach(g => {
+    g.addEventListener('mouseenter', () => {
+      const grp = g.dataset.group;
+      const d = DATA[activePlatform];
+      const rel = d.flows.map((f,i) => (f.fromGrp===grp||f.toGrp===grp)?i:-1).filter(i=>i>=0);
+      if(!rel.length) return;
+      hoverIdx = -99;
+      applyHL(rel);
+    });
+    g.addEventListener('mouseleave', () => { hoverIdx=null; drawConns(); });
+  });
+  document.querySelectorAll('.unit').forEach(u => {
+    u.addEventListener('mouseenter', () => {
+      const unit = u.dataset.unit;
+      const d = DATA[activePlatform];
+      const rel = d.flows.map((f,i) => (f.fromUnit===unit||f.toUnit===unit)?i:-1).filter(i=>i>=0);
+      if(!rel.length) return;
+      hoverIdx = -99;
+      applyHL(rel);
+    });
+    u.addEventListener('mouseleave', () => { hoverIdx=null; drawConns(); });
+  });
+}
+
+function applyHL(rel){
+  const svg = document.getElementById('svg');
+  svg.querySelectorAll('.conn').forEach((p,i) => {
+    p.classList.toggle('hl', rel.includes(i));
+    p.classList.toggle('dim', !rel.includes(i));
+  });
+  svg.querySelectorAll('.ftag-g').forEach((t,i) => t.classList.toggle('show', rel.includes(i)));
+}
+
+function setView(v){
+  currentView = v;
+  document.getElementById('btnSummary').classList.toggle('active', v==='summary');
+  document.getElementById('btnExpanded').classList.toggle('active', v==='expanded');
+  document.querySelectorAll('.grp-details').forEach(d => {
+    if(v==='expanded') d.classList.add('open'); else d.classList.remove('open');
+  });
+  setTimeout(drawConns, 20); setTimeout(drawConns, 120);
+}
+
+function getRect(el){
+  const rr = document.getElementById('diagram').getBoundingClientRect();
+  const er = el.getBoundingClientRect();
+  return {x:er.left-rr.left, y:er.top-rr.top, w:er.width, h:er.height};
+}
+function anch(el, side){
+  const r = getRect(el);
+  return side==='right' ? {x:r.x+r.w, y:r.y+r.h/2} : {x:r.x, y:r.y+r.h/2};
+}
+
+function drawConns(){
+  const svg = document.getElementById('svg');
+  const rr = document.getElementById('diagram').getBoundingClientRect();
+  svg.setAttribute('viewBox', `0 0 ${rr.width} ${rr.height}`);
+  svg.style.width = rr.width+'px';
+  svg.style.height = rr.height+'px';
+  const defs = svg.querySelector('defs').outerHTML;
+  const dark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const tagFill = dark ? '#2C2C2A' : '#FFFFFF';
+  const tagText = dark ? '#E8E6DE' : '#1A1A18';
+  const d = DATA[activePlatform];
+  let lH = '', labH = '';
+
+  d.flows.forEach((f, i) => {
+    let sx,sy,ex,ey;
+    if(f.fromGrp){
+      const gEl = document.querySelector(`[data-group="${f.fromGrp}"]`);
+      const uEl = document.querySelector(`[data-unit="${f.toUnit}"]`);
+      if(!gEl||!uEl) return;
+      const s = anch(gEl,'right'), e = anch(uEl,'left');
+      sx=s.x;sy=s.y;ex=e.x;ey=e.y;
+    } else {
+      const uEl = document.querySelector(`[data-unit="${f.fromUnit}"]`);
+      const gEl = document.querySelector(`[data-group="${f.toGrp}"]`);
+      if(!gEl||!uEl) return;
+      const s = anch(uEl,'right'), e = anch(gEl,'left');
+      sx=s.x;sy=s.y;ex=e.x;ey=e.y;
+    }
+    const cp = Math.max(Math.abs(ex-sx)*0.45, 30);
+    const path = `M${sx},${sy} C${sx+cp},${sy} ${ex-cp},${ey} ${ex},${ey}`;
+    const dash = f.dir==='both' ? 'stroke-dasharray="4 2.5"' : '';
+    const mStart = f.dir==='both' ? 'marker-start="url(#ah)"' : '';
+    const isHl = hoverIdx===i, isDim = hoverIdx!==null && hoverIdx!==i;
+    const cls = isHl?'conn hl':isDim?'conn dim':'conn';
+    lH += `<path class="${cls}" d="${path}" stroke="${f.color}" ${dash} ${mStart} marker-end="url(#ah)"/>`;
+    lH += `<path class="conn-hit" d="${path}" data-fi="${i}"/>`;
+    const mx=(sx+ex)/2, my=(sy+ey)/2, tw=f.label.length*5.4+16;
+    labH += `<g class="ftag-g${isHl?' show':''}"><rect class="ftag-bg" fill="${tagFill}" x="${mx-tw/2}" y="${my-12}" width="${tw}" height="18" rx="5"/><text class="ftag" fill="${tagText}" x="${mx}" y="${my+2}" text-anchor="middle" dominant-baseline="central">${f.label}</text></g>`;
+  });
+
+  svg.innerHTML = defs + lH + labH;
+  svg.querySelectorAll('.conn-hit').forEach(p => {
+    p.addEventListener('mouseenter', e => {
+      hoverIdx = parseInt(p.dataset.fi);
+      drawConns();
+      showTip(e, d.flows[hoverIdx]);
+    });
+    p.addEventListener('mousemove', e => moveTip(e));
+    p.addEventListener('mouseleave', () => { hoverIdx=null; drawConns(); hideTip(); });
+  });
+}
+
+function showTip(e, f){
+  const tip = document.getElementById('tip');
+  const dl = f.dir==='in'?'Inflow':f.dir==='out'?'Outflow':'Bidirectional';
+  const dc = f.dir==='in'?'#639922':f.dir==='out'?'#993556':'#0F6E56';
+  const db = f.dir==='in'?'rgba(99,153,34,0.12)':f.dir==='out'?'rgba(153,53,86,0.12)':'rgba(15,110,86,0.12)';
+  tip.innerHTML = `<div class="tip-title">${f.label}</div><div class="tip-dir" style="background:${db};color:${dc}">${dl}</div><div class="tip-note">${f.note}</div>`;
+  tip.classList.add('show');
+  moveTip(e);
+}
+function moveTip(e){
+  const tip = document.getElementById('tip');
+  const rr = document.getElementById('diagram').getBoundingClientRect();
+  let x = e.clientX-rr.left+14, y = e.clientY-rr.top-20;
+  if(x+230>rr.width) x -= 244;
+  if(y<0) y = 10;
+  tip.style.left = x+'px'; tip.style.top = y+'px';
+}
+function hideTip(){ document.getElementById('tip').classList.remove('show'); }
+
+window.addEventListener('resize', () => drawConns());
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', () => drawConns());
+
+renderNav();
+renderDiagram();
+</script>
+</body>
+</html>
