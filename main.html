@@ -166,6 +166,9 @@ line: {
     {id:'cloud',color:'#185FA5',name:'Cloud & infra',desc:'Compute, data centers, CDN',subs:[
       {label:null,color:'#378ADD',items:['LY Corp / Yahoo Japan infra','AWS (supplementary)','Thai ISPs (peering)']}
     ]},
+    {id:'logistics',color:'#BA7517',name:'Logistics partners',desc:'Delivery fulfillment for LINE Shopping orders',subs:[
+      {label:null,color:'#EF9F27',items:['Kerry Express','Flash Express','Thailand Post','J&T Express']}
+    ]},
   ],
   flows: [
     {fromGrp:'consumers',toUnit:'messenger',label:'Sticker & coin purchases',dir:'in',color:'#534AB7',note:'Users buy stickers, emoji, and LINE Coins for in-app content'},
@@ -176,6 +179,10 @@ line: {
     {fromUnit:'rabbitpay',toGrp:'bts',label:'JV revenue share',dir:'both',color:'#7F77DD',note:'Transit payment settlement, joint venture profit/cost sharing with Rabbit Group'},
     {fromUnit:'messenger',toGrp:'content',label:'Creator payouts',dir:'out',color:'#993556',note:'Revenue share to sticker creators, music licensing fees to labels'},
     {fromUnit:'messenger',toGrp:'cloud',label:'Compute & CDN',dir:'out',color:'#185FA5',note:'Messaging infrastructure, media delivery, data processing'},
+    {fromGrp:'consumers',toUnit:'shopping',label:'Shopping purchases',dir:'in',color:'#534AB7',note:'Product purchases through LINE Shopping / MyShop storefronts'},
+    {fromGrp:'businesses',toUnit:'shopping',label:'Seller fees',dir:'in',color:'#639922',note:'Seller commissions and listing fees on LINE Shopping / MyShop'},
+    {fromUnit:'shopping',toGrp:'banks',label:'Payment processing',dir:'out',color:'#0F6E56',note:'Transaction processing for LINE Shopping orders via bank partners'},
+    {fromUnit:'shopping',toGrp:'logistics',label:'Fulfillment fees',dir:'out',color:'#BA7517',note:'Per-parcel delivery fees for LINE Shopping / MyShop orders'},
   ]
 },
 
@@ -211,11 +218,13 @@ google: {
     {fromGrp:'consumers',toUnit:'youtube',label:'Premium & purchases',dir:'in',color:'#534AB7',note:'YouTube Premium, Music subs, Google One, Play Store app/content purchases'},
     {fromGrp:'consumers',toUnit:'play',label:'App & content spend',dir:'in',color:'#534AB7',note:'In-app purchases, app downloads, Play Pass subscriptions'},
     {fromGrp:'advertisers',toUnit:'googleads',label:'Ad revenue',dir:'in',color:'#639922',note:'Search ads, Display Network, YouTube ads. Dominant revenue source in Thailand'},
-    {fromUnit:'youtube',toGrp:'publishers',label:'Creator payouts',dir:'out',color:'#993556',note:'YouTube Partner Program revenue share (55/45), AdSense payments to Thai publishers'},
+    {fromUnit:'youtube',toGrp:'publishers',label:'Creator & publisher revenue',dir:'both',color:'#993556',note:'Out: YPP revenue share (55/45), AdSense payments. In: content that drives engagement and ad revenue'},
     {fromUnit:'play',toGrp:'telcos',label:'Carrier billing share',dir:'both',color:'#BA7517',note:'DCB revenue share with True/AIS, Android pre-installation deals'},
     {fromUnit:'gcp',toGrp:'developers',label:'Cloud & API revenue',dir:'both',color:'#185FA5',note:'In: GCP consumption by Thai enterprises. Out: Play Store 70/30 revenue share to devs'},
     {fromUnit:'search',toGrp:'cloud_cost',label:'Infra spend',dir:'out',color:'#0F6E56',note:'Thai data center operations, submarine cable consortium fees, ISP peering'},
     {fromUnit:'ai',toGrp:'developers',label:'AI API consumption',dir:'both',color:'#185FA5',note:'Vertex AI, Gemini API usage by Thai developers and enterprises'},
+    {fromGrp:'consumers',toUnit:'ai',label:'AI subscriptions',dir:'in',color:'#534AB7',note:'Gemini Advanced subscriptions, Google One AI Premium, Translate usage'},
+    {fromGrp:'consumers',toUnit:'search',label:'Search & Maps usage',dir:'both',color:'#534AB7',note:'Free search/maps services to consumers; behavioral data powers ad targeting'},
   ]
 },
 
@@ -249,11 +258,17 @@ meta: {
   flows: [
     {fromGrp:'consumers',toUnit:'facebook',label:'Stars & tips',dir:'in',color:'#534AB7',note:'Minimal direct consumer revenue: Stars for creators, avatar purchases'},
     {fromGrp:'advertisers',toUnit:'metaads',label:'Ad revenue',dir:'in',color:'#639922',note:'Dominant revenue: FB/IG ads, Advantage+ campaigns, Audience Network. Bulk of Thai digital ad market'},
-    {fromUnit:'metaads',toGrp:'creators',label:'Creator payouts',dir:'out',color:'#993556',note:'In-stream ad revenue share, Reels Play bonuses, creator fund distributions'},
+    {fromUnit:'metaads',toGrp:'creators',label:'Creator revenue & content',dir:'both',color:'#993556',note:'Out: ad revenue share, Reels bonuses, creator fund. In: content that drives platform engagement and ad value'},
     {fromUnit:'metaai',toGrp:'creators',label:'AI-powered distribution',dir:'out',color:'#993556',note:'AI ranking determines creator reach; algorithmic gatekeeping of Thai content visibility'},
     {fromUnit:'facebook',toGrp:'telcos',label:'Peering & zero-rating',dir:'both',color:'#BA7517',note:'CDN peering reduces telco transit costs; zero-rating deals increase Meta reach'},
     {fromUnit:'metaai',toGrp:'cloud',label:'AI compute',dir:'out',color:'#185FA5',note:'Massive GPU infrastructure for AI training/inference, edge caching for Thai users'},
-    {fromUnit:'instagram',toGrp:'payment',label:'Commerce processing',dir:'out',color:'#0F6E56',note:'Limited in Thailand: IG Shopping checkout, FB Marketplace payment facilitation'},
+    {fromUnit:'instagram',toGrp:'payment',label:'Commerce processing',dir:'out',color:'#0F6E56',note:'Limited in Thailand: IG Shopping checkout, payment facilitation'},
+    {fromGrp:'consumers',toUnit:'instagram',label:'Subscriptions & shopping',dir:'in',color:'#534AB7',note:'Meta Verified subscriptions, IG Shopping purchases, creator tips'},
+    {fromGrp:'consumers',toUnit:'metaai',label:'AI engagement',dir:'both',color:'#534AB7',note:'Meta AI chatbot usage across FB, IG, and WA; consumer data fuels AI training'},
+    {fromGrp:'advertisers',toUnit:'whatsapp',label:'Business API fees',dir:'in',color:'#639922',note:'WhatsApp Business API message fees, Business Platform subscriptions'},
+    {fromUnit:'facebook',toGrp:'payment',label:'Marketplace payments',dir:'out',color:'#0F6E56',note:'FB Marketplace transaction facilitation, payment gateway processing'},
+    {fromUnit:'instagram',toGrp:'telcos',label:'Peering & CDN',dir:'both',color:'#BA7517',note:'CDN peering for IG Reels and Stories video delivery, ISP traffic exchange'},
+    {fromGrp:'consumers',toUnit:'whatsapp',label:'Messaging usage',dir:'both',color:'#534AB7',note:'Free messaging service to consumers; user engagement and reach drive WhatsApp Business value'},
   ]
 },
 
@@ -264,7 +279,6 @@ grab: {
     {id:'transport',name:'GrabCar / GrabBike',desc:'Ride-hailing, transport, corporate rides'},
     {id:'grabpay',name:'GrabPay',desc:'E-wallet, payment acceptance, PayLater'},
     {id:'express',name:'GrabExpress & GrabMart',desc:'On-demand delivery, parcels, grocery/convenience'},
-    {id:'grabai',name:'Grab AI & Data',desc:'Demand prediction, dynamic pricing, route optimization, GrabMaps'},
   ],
   left: [
     {id:'consumers',color:'#534AB7',name:'Consumers',desc:'Ride fares, food orders, delivery fees, GrabPay top-ups',entities:[]},
@@ -293,8 +307,10 @@ grab: {
     {fromUnit:'food',toGrp:'drivers',label:'Delivery payouts',dir:'out',color:'#BA7517',note:'Per-delivery fees to GrabFood delivery partners, bonuses and incentives'},
     {fromUnit:'transport',toGrp:'drivers',label:'Driver payouts',dir:'out',color:'#BA7517',note:'Fare revenue share to drivers (typically 75-80%), surge incentives'},
     {fromUnit:'grabpay',toGrp:'banks',label:'Processing & lending',dir:'both',color:'#0F6E56',note:'Out: processing fees. In: KBank credit facilities for PayLater, co-lending'},
-    {fromUnit:'grabai',toGrp:'cloud',label:'Compute & mapping',dir:'out',color:'#185FA5',note:'AWS for core infra, GrabMaps development, ML model training/inference'},
+    {fromUnit:'food',toGrp:'cloud',label:'Compute & mapping',dir:'out',color:'#185FA5',note:'AWS for core infra, GrabMaps, ML for demand prediction and route optimization'},
     {fromUnit:'transport',toGrp:'insurance',label:'Insurance & licensing',dir:'out',color:'#993556',note:'Mandatory ride-hailing insurance premiums, DLT licensing compliance'},
+    {fromGrp:'consumers',toUnit:'express',label:'Delivery & grocery',dir:'in',color:'#534AB7',note:'On-demand delivery fees, GrabMart grocery and convenience store orders'},
+    {fromUnit:'express',toGrp:'drivers',label:'Courier payouts',dir:'out',color:'#BA7517',note:'Per-delivery fees to GrabExpress couriers and GrabMart shoppers'},
   ]
 },
 
@@ -337,6 +353,8 @@ truecorp: {
     {fromUnit:'mobile',toGrp:'nbtc',label:'Spectrum & regulation',dir:'out',color:'#BA7517',note:'Spectrum license installments, USO fund contributions, regulatory fees'},
     {fromUnit:'truemoney',toGrp:'banks',label:'Settlement & lending',dir:'both',color:'#0F6E56',note:'Out: settlement processing. In: banking partnerships, credit facilities'},
     {fromUnit:'mobile',toGrp:'carriers',label:'Interconnection',dir:'both',color:'#7F77DD',note:'International roaming revenue share, submarine cable consortium fees'},
+    {fromGrp:'consumers',toUnit:'visions',label:'TV & streaming subs',dir:'in',color:'#534AB7',note:'TrueVisions pay TV packages, TrueID streaming subscriptions'},
+    {fromGrp:'enterprise',toUnit:'online',label:'Connectivity & ICT',dir:'in',color:'#639922',note:'Enterprise fiber, leased lines, SD-WAN, managed network services'},
   ]
 },
 
@@ -347,7 +365,6 @@ tiktok: {
     {id:'shop',name:'TikTok Shop',desc:'In-app e-commerce, affiliate program, seller marketplace'},
     {id:'ttads',name:'TikTok Ads',desc:'In-feed ads, branded effects, TopView, Spark Ads'},
     {id:'creator',name:'Creator ecosystem',desc:'Creator fund, LIVE gifts, creator marketplace'},
-    {id:'ttai',name:'TikTok AI / Algorithm',desc:'FYP recommendation engine, content moderation, AI effects/filters'},
   ],
   left: [
     {id:'consumers',color:'#534AB7',name:'Consumers',desc:'TikTok Coins (LIVE gifts), TikTok Shop purchases',entities:[]},
@@ -375,10 +392,10 @@ tiktok: {
     {fromGrp:'consumers',toUnit:'shop',label:'Shop purchases',dir:'in',color:'#534AB7',note:'Product purchases through TikTok Shop integrated checkout'},
     {fromGrp:'advertisers',toUnit:'ttads',label:'Ad revenue',dir:'in',color:'#639922',note:'In-feed ads, TopView, Spark Ads, branded effects from Thai brands and agencies'},
     {fromGrp:'advertisers',toUnit:'shop',label:'Shop commissions',dir:'in',color:'#639922',note:'Seller commissions on TikTok Shop transactions, affiliate fees'},
-    {fromUnit:'creator',toGrp:'creators',label:'Creator payouts',dir:'out',color:'#993556',note:'Creator fund, LIVE gift revenue share (typically 50-70%), affiliate commissions'},
+    {fromUnit:'creator',toGrp:'creators',label:'Creator revenue & content',dir:'both',color:'#993556',note:'Out: creator fund, LIVE gift share (50-70%), affiliates. In: content that drives platform engagement'},
     {fromUnit:'shop',toGrp:'logistics',label:'Fulfillment fees',dir:'out',color:'#BA7517',note:'Per-parcel delivery fees for TikTok Shop orders'},
     {fromUnit:'shop',toGrp:'banks',label:'Payment processing',dir:'out',color:'#0F6E56',note:'Transaction processing fees for TikTok Shop and Coins purchases'},
-    {fromUnit:'ttai',toGrp:'cloud',label:'AI compute & CDN',dir:'out',color:'#185FA5',note:'Massive compute for FYP recommendation, content moderation, video delivery CDN'},
+    {fromUnit:'video',toGrp:'cloud',label:'AI compute & CDN',dir:'out',color:'#185FA5',note:'FYP recommendation compute, content moderation, video delivery CDN'},
     {fromUnit:'video',toGrp:'music',label:'Music licensing',dir:'out',color:'#7F77DD',note:'Licensing fees to UMG, Sony, Warner, GMM Grammy for platform music catalog'},
   ]
 }
