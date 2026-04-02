@@ -1,0 +1,6 @@
+# Only track ecosystem.html, main.html, and ecosystem-map.md
+*
+!.gitignore
+!ecosystem.html
+!main.html
+!ecosystem-map.md
