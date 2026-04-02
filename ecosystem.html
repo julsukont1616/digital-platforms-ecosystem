@@ -150,7 +150,7 @@ const NODES = {
   advertising:     { layer: 2, x: 474, w: 118, y: 292, h: 56, color: '#4285F4', name: 'Advertising', sub: 'Google Ads, Meta Ads' },
   news:            { layer: 2, x: 611, w: 118, y: 292, h: 56, color: '#4285F4', name: 'News & Media', sub: 'Thairath, THE STANDARD' },
   marketplaces:    { layer: 3, x: 66,  w: 148, y: 384, h: 56, color: '#D85A30', name: 'Marketplaces', sub: 'Shopee, Lazada, TikTok Shop' },
-  superapps:       { layer: 3, x: 236, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Super-apps', sub: 'Grab, LINE MAN' },
+  superapps:       { layer: 3, x: 236, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Super-apps', sub: 'Grab, LINE MAN, Bolt' },
   social_commerce: { layer: 3, x: 406, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Social Commerce', sub: 'FB Shops, LINE Shopping' },
   streaming:       { layer: 3, x: 576, w: 148, y: 384, h: 56, color: '#D85A30', name: 'Streaming', sub: 'YouTube, Netflix, Viu' },
   promptpay:       { layer: 4, x: 66,  w: 148, y: 476, h: 56, color: '#0F6E56', name: 'Public Rails', sub: 'PromptPay, PromptBiz' },
@@ -386,6 +386,9 @@ FLOWS.discovery.connections = [
   { from: 'consumers', to: 'telecom',      label: 'Go online',               waypoints: [aBot('consumers'), [140,178], [177.5,178], aTop('telecom')] },
   { from: 'consumers', to: 'app_stores',   label: 'Install apps',            waypoints: [aBot('consumers'), [140,183], [388.5,183], aTop('app_stores')] },
   { from: 'consumers', to: 'browsers',     label: 'Open web',                waypoints: [aBot('consumers'), [140,188], [599.5,188], aTop('browsers')] },
+  // access lateral: telecom enables app stores and browsers
+  { from: 'telecom', to: 'app_stores',    label: 'Mobile data',             waypoints: [aRight('telecom'), [350,193], aLeft('app_stores')], lateral: true },
+  { from: 'telecom', to: 'browsers',      label: 'Fixed broadband',         waypoints: [aRight('telecom'), [350,188], [610,188], aLeft('browsers')], lateral: true },
   { from: 'app_stores', to: 'social',      label: 'Install social apps',     waypoints: [aBot('app_stores'), [388.5,274], [224,274], aTop('social')] },
   { from: 'app_stores', to: 'messaging',   label: 'Install messaging',       waypoints: [aBot('app_stores'), [388.5,280], [344,280], aTop('messaging')] },
   { from: 'app_stores', to: 'streaming',   label: 'Install content apps',    waypoints: [aBot('app_stores'), [388.5,266], [704,266], aTop('streaming')] },
@@ -413,6 +416,7 @@ FLOWS.discovery.connections = [
   { from: 'advertising', to: 'superapps',  label: 'App install / demand',    waypoints: [aBot('advertising'), [464,364], [390,364], aTop('superapps')] },
   { from: 'advertising', to: 'social_commerce', label: 'Boosted listings',   waypoints: [aBot('advertising'), [464,384], [650,384], aTop('social_commerce')] },
   { from: 'streaming',  to: 'social_commerce', label: 'Creator-led commerce', waypoints: [aBot('streaming'), [704,372], [650,372], aTop('social_commerce')] },
+  { from: 'news',       to: 'marketplaces',    label: 'Affiliate traffic',    waypoints: [aBot('news'), [584,354], [140,354], aTop('marketplaces')] },
   { from: 'advertising', to: 'creators',   label: 'Brand campaigns',         waypoints: [aTop('advertising'), [464,258], [752,258], [752,106], [480,106], aTop('creators')] },
 ];
 
@@ -425,14 +429,20 @@ FLOWS.money.connections = [
   { from: 'marketplaces', to: 'cards', label: 'Card checkout', waypoints: [aBot('marketplaces'), [140,466], [650,466], aTop('cards')] },
   { from: 'marketplaces', to: 'banks', label: 'Bank app checkout', waypoints: [aBot('marketplaces'), [140,455], [310,455], aTop('banks')] },
   { from: 'superapps', to: 'ewallets', label: 'In-app payment', waypoints: [aBot('superapps'), [390,458], [480,458], aTop('ewallets')] },
+  { from: 'superapps', to: 'promptpay', label: 'QR checkout', waypoints: [aBot('superapps'), [390,456], [140,456], aTop('promptpay')] },
+  { from: 'superapps', to: 'banks', label: 'Bank app checkout', waypoints: [aBot('superapps'), [390,451], [310,451], aTop('banks')] },
+  { from: 'superapps', to: 'cards', label: 'Card payment', waypoints: [aBot('superapps'), [390,470], [650,470], aTop('cards')] },
   { from: 'social_commerce', to: 'ewallets', label: 'Social checkout', waypoints: [aBot('social_commerce'), [650,460], [480,460], aTop('ewallets')] },
+  { from: 'social_commerce', to: 'banks', label: 'Bank transfer', waypoints: [aBot('social_commerce'), [650,464], [310,464], aTop('banks')] },
+  { from: 'social_commerce', to: 'cards', label: 'Card payment', waypoints: [aBot('social_commerce'), aTop('cards')] },
+  { from: 'social_commerce', to: 'promptpay', label: 'QR payment', waypoints: [aBot('social_commerce'), [650,468], [140,468], aTop('promptpay')] },
   { from: 'streaming', to: 'cards', label: 'Subscription checkout', waypoints: [aBot('streaming'), [704,452], [650,452], aTop('cards')] },
   { from: 'merchants', to: 'marketplaces', label: 'Seller fees / commission', waypoints: [aBot('merchants'), [310,272], [270,272], [270,360], [140,360], aTop('marketplaces')] },
   { from: 'merchants', to: 'social_commerce', label: 'Store tools / commission', waypoints: [aBot('merchants'), [310,268], [520,268], [520,380], [650,380], aTop('social_commerce')] },
   { from: 'streaming', to: 'app_stores', label: 'App-store commission', waypoints: [aTop('streaming'), [704,186], [388.5,186], aTop('app_stores')] },
   { from: 'marketplaces', to: 'warehouses', label: 'Fulfillment fees', waypoints: [aRight('marketplaces'), [748,412], [748,564], [599.5,564], aTop('warehouses')] },
-  { from: 'merchants', to: 'banks', label: 'Merchant settlement', waypoints: [aTop('merchants'), [310,106], [8,106], [8,504], aLeft('banks')] },
-  { from: 'creators', to: 'banks',  label: 'Creator payout', waypoints: [aTop('creators'), [480,106], [752,106], [752,504], aRight('banks')] },
+  { from: 'banks', to: 'merchants', label: 'Merchant settlement', waypoints: [aLeft('banks'), [8,504], [8,106], [310,106], aTop('merchants')] },
+  { from: 'banks', to: 'creators',  label: 'Creator payout', waypoints: [aRight('banks'), [752,504], [752,106], [480,106], aTop('creators')] },
   { from: 'banks', to: 'parcels',   label: 'Logistics fees', waypoints: [aBot('banks'), [310,550], [177.5,550], aTop('parcels')] },
   { from: 'banks', to: 'riders',    label: 'Rider payout', waypoints: [aBot('banks'), [310,554], [388.5,554], aTop('riders')] },
   { from: 'promptpay', to: 'banks', label: 'Interbank rails', waypoints: [aRight('promptpay'), [220,453], [310,453], aTop('banks')], lateral: true },
@@ -441,6 +451,7 @@ FLOWS.money.connections = [
 ];
 
 FLOWS.physical.connections = [
+  { from: 'merchants', to: 'parcels', label: 'Self-fulfillment', waypoints: [aTop('merchants'), [310,100], [766,100], [766,554], [177.5,554], aTop('parcels')] },
   { from: 'marketplaces', to: 'parcels', label: 'Ship order', waypoints: [aLeft('marketplaces'), [36,412], [36,566], [177.5,566], aTop('parcels')] },
   { from: 'marketplaces', to: 'warehouses', label: 'Fulfillment', waypoints: [aLeft('marketplaces'), [22,412], [22,566], [599.5,566], aTop('warehouses')] },
   { from: 'superapps', to: 'riders', label: 'Dispatch rider', waypoints: [aLeft('superapps'), [8,412], [8,566], [388.5,566], aTop('riders')] },
@@ -456,6 +467,9 @@ FLOWS.data.connections = [
   { from: 'ai_ml', to: 'social', label: 'Content ranking', waypoints: [aLeft('ai_ml'), [22,688], [22,290], [224,290], aTop('social')], dashed: true },
   { from: 'ai_ml', to: 'marketplaces', label: 'Recommendations', waypoints: [aLeft('ai_ml'), [8,688], [8,382], [140,382], aTop('marketplaces')], dashed: true },
   { from: 'ai_ml', to: 'advertising', label: 'Targeting / optimization', waypoints: [aLeft('ai_ml'), [52,688], [52,290], [464,290], aTop('advertising')], dashed: true },
+  { from: 'ai_ml', to: 'superapps', label: 'Matching & pricing', waypoints: [aLeft('ai_ml'), [44,688], [44,382], [390,382], aTop('superapps')], dashed: true },
+  { from: 'ai_ml', to: 'streaming', label: 'Recommendations', waypoints: [aLeft('ai_ml'), [58,688], [58,290], [704,290], aTop('streaming')], dashed: true },
+  { from: 'ai_ml', to: 'social_commerce', label: 'Product ranking', waypoints: [aLeft('ai_ml'), [14,688], [14,382], [650,382], aTop('social_commerce')], dashed: true },
   { from: 'consumers', to: 'cloud', label: 'Behavior / identity data', waypoints: [aLeft('consumers'), [64,136], [64,746], [229,746], aTop('cloud')] },
   { from: 'merchants', to: 'cloud', label: 'Catalog / seller data', waypoints: [aBot('merchants'), [310,734], [234,734], aTop('cloud')] },
   { from: 'creators', to: 'cloud', label: 'Content / audience data', waypoints: [aBot('creators'), [480,730], [239,730], aTop('cloud')] },
@@ -467,8 +481,13 @@ FLOWS.data.connections = [
   { from: 'superapps', to: 'cloud', label: 'Location & txn data', waypoints: [aRight('superapps'), [747,412], [747,738], [269,738], aTop('cloud')] },
   { from: 'streaming', to: 'cloud', label: 'Viewing data', waypoints: [aRight('streaming'), [735,320], [735,736], [274,736], aTop('cloud')] },
   { from: 'social_commerce', to: 'cloud', label: 'Commerce data', waypoints: [aRight('social_commerce'), [730,412], [730,734], [279,734], aTop('cloud')] },
+  { from: 'banks', to: 'cloud', label: 'Financial data', waypoints: [aRight('banks'), [725,504], [725,726], [284,726], aTop('cloud')] },
+  { from: 'ewallets', to: 'cloud', label: 'Wallet txn data', waypoints: [aRight('ewallets'), [720,504], [720,722], [289,722], aTop('cloud')] },
+  { from: 'cards', to: 'cloud', label: 'Card network data', waypoints: [aRight('cards'), [715,504], [715,718], [294,718], aTop('cloud')] },
   { from: 'cloud', to: 'ai_ml', label: 'Compute / model serving', waypoints: [[300,752], [300,734], [405,734], [405,716]] },
   { from: 'cloud', to: 'cdn', label: 'Content delivery', waypoints: [aRight('cloud'), [380,738], [554,738], aTop('cdn')], lateral: true },
+  { from: 'cdn', to: 'streaming', label: 'Content serving', waypoints: [aTop('cdn'), [554,740], [770,740], [770,292], [704,292], aTop('streaming')], dashed: true },
+  { from: 'news', to: 'cloud', label: 'Readership data', waypoints: [aRight('news'), [763,320], [763,720], [299,720], aTop('cloud')] },
 ];
 
 // Remap hardcoded waypoint coordinates; anchor-tagged points (length>2) are already correct
@@ -575,8 +594,8 @@ const TOOLTIPS = {
   messaging:       'LINE (56M users, dominant). WhatsApp. Telegram. Facebook Messenger.',
   advertising:     'Google Ads. Meta/Facebook Ads. TikTok Ads. LINE Ads. Programmatic DSPs.',
   news:            'Thairath Online. Matichon. THE STANDARD. Workpoint. Khaosod.',
-  marketplaces:    'Shopee (#1 GMV). Lazada. TikTok Shop (fastest growing). NocNoc. JD Central (closed).',
-  superapps:       'Grab (ride-hail + food + pay). LINE MAN (food + messenger). Robinhood (food, Thai-owned).',
+  marketplaces:    'Shopee (#1 GMV). Lazada. TikTok Shop (fastest growing). NocNoc.',
+  superapps:       'Grab (ride-hail + food + pay). LINE MAN (food + messenger). bolt (ride-hail, Bangkok).',
   social_commerce: 'Facebook Shops & Marketplace. LINE Shopping. TikTok Shop. Instagram Shopping.',
   streaming:       'YouTube (dominant). Netflix. MONOMAX (Thai). Viu. Disney+ Hotstar. WeTV.',
   promptpay:       'PromptPay: 92.2M IDs registered (Jan 2026). 79.9M daily transactions. PromptBiz for B2B.',
@@ -592,7 +611,7 @@ const TOOLTIPS = {
 
 TOOLTIPS.app_stores = 'Mobile app distribution: Apple App Store. Google Play Store. Huawei AppGallery. Samsung Galaxy Store.';
 TOOLTIPS.browsers = 'Chrome (dominant). Safari. Samsung Internet. Firefox. In-app browsers.';
-TOOLTIPS.streaming = 'YouTube (dominant video discovery). Netflix. MONOMAX (Thai). Viu. Disney+ Hotstar. WeTV.';
+TOOLTIPS.streaming = 'YouTube (dominant video discovery). Netflix. MONOMAX (Thai). Viu. Disney+. WeTV.';
 
 let activeFlowName = 'discovery';
 const hitLayer = document.getElementById('hit-layer');
@@ -772,9 +791,10 @@ const MOBILE_SUMMARIES = {
   data: 'Platform data flows down to cloud infrastructure. AI intelligence feeds up to enhance search, social, and commerce.',
 };
 
-MOBILE_SUMMARIES.discovery = 'App stores and browsers feed search, social, news, and streaming, which convert into marketplaces, super-apps, and social commerce.';
-MOBILE_SUMMARIES.money = 'Consumers pay through banks, wallets, and cards. Merchants pay platform fees, while platforms pay app-store and fulfillment commissions.';
-MOBILE_SUMMARIES.data = 'Participant and platform data accumulates in cloud infrastructure. AI feeds ranking, targeting, and recommendations back into the journey.';
+MOBILE_SUMMARIES.discovery = 'Telecom enables app stores and browsers, which feed search, social, news, and streaming. These convert into marketplaces, super-apps, and social commerce.';
+MOBILE_SUMMARIES.money = 'Consumers pay through banks, wallets, cards, and QR. Merchants pay platform fees and commissions. Banks settle funds back to merchants and creators.';
+MOBILE_SUMMARIES.physical = 'Marketplaces ship via parcel networks and warehouses. Super-apps dispatch riders. Merchants also self-fulfill via parcels. Goods reach consumers.';
+MOBILE_SUMMARIES.data = 'Participant, platform, and financial data accumulates in cloud infrastructure. AI feeds ranking, matching, pricing, and recommendations back into the journey. CDN serves content to streaming and media.';
 MOBILE_SUMMARIES.overview = 'All platforms and infrastructure layers in the Thai digital ecosystem.';
 
 const LAYER_DATA = [
